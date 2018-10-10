@@ -121,7 +121,7 @@ public class JetFightersCore extends ApplicationAdapter {
             }
             if (meteor.getRectangle().overlaps(jet.getRectangle())) {
                 dropSound.play();
-                System.exit(0);
+                Gdx.app.exit();
                 //iter.remove();
             }
 
