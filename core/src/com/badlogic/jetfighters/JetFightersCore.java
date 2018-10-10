@@ -1,11 +1,5 @@
 package com.badlogic.jetfighters;
 
-import com.badlogic.jetfighters.model.Jet;
-import com.badlogic.jetfighters.model.Meteor;
-import com.badlogic.jetfighters.model.Missile;
-import com.badlogic.jetfighters.render.JetRenderer;
-import com.badlogic.jetfighters.render.MeteorRenderer;
-import com.badlogic.jetfighters.render.MissileRenderer;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -15,6 +9,12 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.jetfighters.model.Jet;
+import com.badlogic.jetfighters.model.Meteor;
+import com.badlogic.jetfighters.model.Missile;
+import com.badlogic.jetfighters.render.JetRenderer;
+import com.badlogic.jetfighters.render.MeteorRenderer;
+import com.badlogic.jetfighters.render.MissileRenderer;
 
 import java.util.Iterator;
 import java.util.Random;
@@ -26,11 +26,11 @@ public class JetFightersCore extends ApplicationAdapter {
     private SpriteBatch batch;
     private OrthographicCamera camera;
 
-    private Sound dropSound;
+    private Sound explosionSound;
     private Music airplaneMusic;
 
     private Jet jet;
-    private Array<Jet> spaceships;
+    private Array<Jet> jets;
     private Array<Missile> missiles;
     private Array<Meteor> meteors;
 
@@ -43,8 +43,8 @@ public class JetFightersCore extends ApplicationAdapter {
 
     @Override
     public void create() {
-        // load the drop sound effect and the rain background "music"
-        dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
+        // load the explosion sound effect and the airplane background "music"
+        explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.wav"));
         airplaneMusic = Gdx.audio.newMusic(Gdx.files.internal("airplane.mp3"));
 
         // start the playback of the background music immediately
@@ -59,10 +59,10 @@ public class JetFightersCore extends ApplicationAdapter {
         jet = new Jet(800 / 2 - 64 / 2, 20);
 
         // create containers and spawn the first jet
-        missiles = new Array<Missile>();
-        spaceships = new Array<Jet>();
-        meteors = new Array<Meteor>();
-        spaceships.add(jet);
+        missiles = new Array<>();
+        jets = new Array<>();
+        meteors = new Array<>();
+        jets.add(jet);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class JetFightersCore extends ApplicationAdapter {
         batch.setProjectionMatrix(camera.combined);
 
         // render everything, should be in same batch?
-        jetRenderer.render(spaceships);
+        jetRenderer.render(jets);
         missileRenderer.render(missiles);
         meteorRenderer.render(meteors);
 
@@ -93,10 +93,11 @@ public class JetFightersCore extends ApplicationAdapter {
             jet.setLastShootTime(System.currentTimeMillis());
         }
 
-        // make sure the bucket stays within the screen bounds
+        // make sure the jet stays within the screen bounds
         if (jet.getX() < 0) jet.setX(0);
         if (jet.getX() > 800 - 64) jet.setX(800 - 64);
-
+        if (jet.getY() < 0) jet.setY(0);
+        if (jet.getY() > 480 - 53) jet.setY(480 - 53);
 
         // move missiles, remove any that are beneath the top edge of
         // the screen or that hit the enemy. In the latter case we play back
@@ -114,15 +115,15 @@ public class JetFightersCore extends ApplicationAdapter {
             for (Iterator<Missile> iterMissile = missiles.iterator(); iterMissile.hasNext(); ) {
                 Missile missile = iterMissile.next();
                 if (meteor.getRectangle().overlaps(missile.getRectangle())) {
-                    dropSound.play();
+                    explosionSound.play();
                     iter.remove();
                     iterMissile.remove();
                 }
             }
             if (meteor.getRectangle().overlaps(jet.getRectangle())) {
-                dropSound.play();
-                Gdx.app.exit();
-                //iter.remove();
+                explosionSound.play();
+                jets.iterator().next();
+                jets.iterator().remove();
             }
 
             if (meteor.getY() + 143 < 0) iter.remove();
@@ -141,7 +142,7 @@ public class JetFightersCore extends ApplicationAdapter {
     @Override
     public void dispose() {
         // dispose of all the native resources
-        dropSound.dispose();
+        explosionSound.dispose();
         airplaneMusic.dispose();
         batch.dispose();
     }
