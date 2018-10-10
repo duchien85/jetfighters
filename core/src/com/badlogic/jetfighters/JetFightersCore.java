@@ -27,7 +27,7 @@ public class JetFightersCore extends ApplicationAdapter {
     private OrthographicCamera camera;
 
     private Sound dropSound;
-    private Music rainMusic;
+    private Music airplaneMusic;
 
     private Jet jet;
     private Array<Jet> spaceships;
@@ -45,11 +45,11 @@ public class JetFightersCore extends ApplicationAdapter {
     public void create() {
         // load the drop sound effect and the rain background "music"
         dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
-        rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
+        airplaneMusic = Gdx.audio.newMusic(Gdx.files.internal("airplane.mp3"));
 
         // start the playback of the background music immediately
-        rainMusic.setLooping(true);
-        rainMusic.play();
+        airplaneMusic.setLooping(true);
+        airplaneMusic.play();
 
         // create the camera and the SpriteBatch
         camera = new OrthographicCamera();
@@ -68,7 +68,7 @@ public class JetFightersCore extends ApplicationAdapter {
     @Override
     public void render() {
         // Clear screen and fill with dark blue
-        Gdx.gl.glClearColor(0, 0, 0.2f, 1);
+        Gdx.gl.glClearColor(0, 0.2f, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         // tell the camera to update its matrices.
@@ -142,7 +142,7 @@ public class JetFightersCore extends ApplicationAdapter {
     public void dispose() {
         // dispose of all the native resources
         dropSound.dispose();
-        rainMusic.dispose();
+        airplaneMusic.dispose();
         batch.dispose();
     }
 }
