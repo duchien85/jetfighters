@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Jet implements Renderable {
-    private float y;
     private float x;
+    private float y;
 
     private AtomicInteger currentTexture = new AtomicInteger(0);
     private final Map<Integer, Texture> textures = new HashMap<>();
