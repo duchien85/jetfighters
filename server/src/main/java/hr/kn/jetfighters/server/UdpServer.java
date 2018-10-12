@@ -29,7 +29,6 @@ public class UdpServer {
             InetAddress address = InetAddress.getLocalHost();
             System.out.printf("Waiting for messages [%s:%d]\n", String.format(address.toString()), SERVER_PORT);
             b.bind(address, SERVER_PORT).sync().channel().closeFuture().await();
-
         } finally {
         }
     }
@@ -39,7 +38,7 @@ public class UdpServer {
             @Override
             public void initChannel(final NioDatagramChannel ch) {
                 ChannelPipeline p = ch.pipeline();
-                p.addLast(new IncommingPacketHandler());
+                p.addLast(new ServerPacketHandler());
             }
         };
     }
