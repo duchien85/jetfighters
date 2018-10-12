@@ -1,6 +1,6 @@
 package hr.kn.jetfighters.server;
 
-import hr.kn.jetfighters.JetFighterDto;
+import com.badlogic.jetfighters.dto.JetFighterDto;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.InetAddress;
-
 
 public class ServerPacketHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 

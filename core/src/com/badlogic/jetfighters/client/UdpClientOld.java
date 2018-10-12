@@ -1,6 +1,6 @@
-package hr.kn.jetfighters.client;
+package com.badlogic.jetfighters.client;
 
-import hr.kn.jetfighters.JetFighterDto;
+import com.badlogic.jetfighters.dto.JetFighterDto;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

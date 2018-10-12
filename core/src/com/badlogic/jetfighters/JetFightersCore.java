@@ -9,19 +9,33 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.jetfighters.client.UdpClient;
+import com.badlogic.jetfighters.dto.JetMoveMessage;
 import com.badlogic.jetfighters.model.Jet;
 import com.badlogic.jetfighters.model.Meteor;
 import com.badlogic.jetfighters.model.Missile;
 import com.badlogic.jetfighters.render.JetRenderer;
 import com.badlogic.jetfighters.render.MeteorRenderer;
 import com.badlogic.jetfighters.render.MissileRenderer;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.channel.socket.DatagramPacket;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.Random;
 
 public class JetFightersCore extends ApplicationAdapter {
 
     private Random random = new Random();
+
+    private final Integer SERVER_PORT = 9956;
 
     private SpriteBatch batch;
     private OrthographicCamera camera;
@@ -41,8 +55,18 @@ public class JetFightersCore extends ApplicationAdapter {
     private long METEOR_SPWAN_TIME = 3000;
     private long lastMeteorTime = 0;
 
+    private UdpClient client = new UdpClient();
+    private Channel channel;
+
     @Override
     public void create() {
+        // connect to UDP server
+        try {
+            channel = client.start();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         // load the explosion sound effect and the airplane background "music"
         explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.wav"));
         airplaneMusic = Gdx.audio.newMusic(Gdx.files.internal("airplane.mp3"));
@@ -133,10 +157,32 @@ public class JetFightersCore extends ApplicationAdapter {
             spawnNewMeteor();
             lastMeteorTime = System.currentTimeMillis();
         }
+        reportNewCoordinatesToServer();
     }
 
     private void spawnNewMeteor() {
         meteors.add(new Meteor(random.nextInt((800) + 1), 600));
+    }
+
+    private void reportNewCoordinatesToServer() {
+        try {
+            String host = InetAddress.getLocalHost().getHostAddress();
+            InetSocketAddress remoteAddress = new InetSocketAddress(host, SERVER_PORT);
+            JetMoveMessage dto = new JetMoveMessage(jet.getX(), jet.getY());
+            ByteBuf byteBuf = Unpooled.copiedBuffer(serialize(dto));
+            channel.writeAndFlush(new DatagramPacket(byteBuf, remoteAddress));
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private byte[] serialize(Object obj) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ObjectOutputStream os = new ObjectOutputStream(out);
+        os.writeObject(obj);
+        return out.toByteArray();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package hr.kn.jetfighters;
+package com.badlogic.jetfighters.dto;
 
 import java.io.Serializable;
 
