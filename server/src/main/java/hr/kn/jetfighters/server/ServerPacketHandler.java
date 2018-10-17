@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.InetAddress;
 
+@Deprecated
 public class ServerPacketHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
     private Logger LOGGER = LoggerFactory.getLogger(ServerPacketHandler.class);

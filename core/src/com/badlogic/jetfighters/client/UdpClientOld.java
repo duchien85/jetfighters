@@ -10,6 +10,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+@Deprecated
 public class UdpClientOld {
 
     private static InetAddress serverAddress = null;
