@@ -1,6 +1,6 @@
 package com.badlogic.jetfighters.client;
 
-import com.badlogic.jetfighters.dto.JetMoveMessage;
+import com.badlogic.jetfighters.dto.request.JetMoveMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;

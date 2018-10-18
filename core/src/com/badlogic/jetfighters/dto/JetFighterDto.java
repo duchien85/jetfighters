@@ -2,6 +2,7 @@ package com.badlogic.jetfighters.dto;
 
 import java.io.Serializable;
 
+@Deprecated
 public class JetFighterDto implements Serializable {
     private float x;
     private float y;

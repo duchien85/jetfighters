@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Jet implements Renderable {
+    private String jetId;
     private float x;
     private float y;
 
@@ -18,10 +19,11 @@ public class Jet implements Renderable {
     private final Rectangle rectangle;
     private long lastShootTime;
 
-    public Jet(float x, float y) {
+    public Jet(String jetId, float x, float y) {
+        this.jetId = jetId;
         this.x = x;
         this.y = y;
-        this.rectangle = new Rectangle(x, y, 64, 89);
+        this.rectangle = new Rectangle(x, y, 64, 53);
         this.textures.put(0, new Texture(Gdx.files.internal("fighter/1.png")));
         this.textures.put(1, new Texture(Gdx.files.internal("fighter/2.png")));
         this.textures.put(2, new Texture(Gdx.files.internal("fighter/3.png")));
@@ -47,6 +49,10 @@ public class Jet implements Renderable {
 
     public Rectangle getRectangle() {
         return rectangle;
+    }
+
+    public String getJetId() {
+        return jetId;
     }
 
     @Override

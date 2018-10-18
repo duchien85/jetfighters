@@ -10,7 +10,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.jetfighters.client.UdpClient;
-import com.badlogic.jetfighters.dto.JetMoveMessage;
+import com.badlogic.jetfighters.dto.request.JetMoveMessage;
+import com.badlogic.jetfighters.dto.request.JoinGameMessage;
 import com.badlogic.jetfighters.model.Jet;
 import com.badlogic.jetfighters.model.Meteor;
 import com.badlogic.jetfighters.model.Missile;
@@ -20,6 +21,7 @@ import com.badlogic.jetfighters.render.MissileRenderer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.socket.DatagramPacket;
 
 import java.io.ByteArrayOutputStream;
@@ -33,8 +35,17 @@ import java.util.Random;
 
 public class JetFightersCore extends ApplicationAdapter {
 
+    public boolean SERVER_CONNECTED = false;
+
+    private String jetId;
+
+    public JetFightersCore(String jetId) {
+        this.jetId = jetId;
+    }
+
     private Random random = new Random();
 
+    private InetSocketAddress remoteAddress;
     private final Integer SERVER_PORT = 9956;
 
     private SpriteBatch batch;
@@ -62,8 +73,10 @@ public class JetFightersCore extends ApplicationAdapter {
     public void create() {
         // connect to UDP server
         try {
-            channel = client.start();
-        } catch (InterruptedException e) {
+            String host = InetAddress.getLocalHost().getHostAddress();
+            channel = client.start(this);
+            remoteAddress = new InetSocketAddress(host, SERVER_PORT);
+        } catch (InterruptedException | UnknownHostException e) {
             e.printStackTrace();
         }
 
@@ -80,13 +93,26 @@ public class JetFightersCore extends ApplicationAdapter {
         camera.setToOrtho(false, 800, 480);
         batch = new SpriteBatch();
 
-        jet = new Jet(800 / 2 - 64 / 2, 20);
+        jet = new Jet(jetId, 800 / 2 - 64 / 2, 20);
 
         // create containers and spawn the first jet
         missiles = new Array<>();
         jets = new Array<>();
         meteors = new Array<>();
         jets.add(jet);
+
+        JoinGameMessage dto = new JoinGameMessage(jetId);
+        ByteBuf byteBuf = Unpooled.copiedBuffer(serialize(dto));
+        if (byteBuf.readableBytes() > 0) {
+            ChannelFuture joinGameFuture = channel.writeAndFlush(new DatagramPacket(byteBuf, remoteAddress));
+            joinGameFuture.addListener(future -> {
+                while (!SERVER_CONNECTED) {
+                    // We're waiting for success connection to server
+                    System.out.println("Server not connected...");
+                }
+                System.out.println("Connection acquired!");
+            });
+        }
     }
 
     @Override
@@ -107,12 +133,12 @@ public class JetFightersCore extends ApplicationAdapter {
         missileRenderer.render(missiles);
         meteorRenderer.render(meteors);
 
-        // process keyboard input
+        // process keyboard input for jet1
         if (Gdx.input.isKeyPressed(Keys.UP)) jet.setY(jet.getY() + 200 * Gdx.graphics.getDeltaTime());
         if (Gdx.input.isKeyPressed(Keys.DOWN)) jet.setY(jet.getY() - 200 * Gdx.graphics.getDeltaTime());
         if (Gdx.input.isKeyPressed(Keys.LEFT)) jet.setX(jet.getX() - 200 * Gdx.graphics.getDeltaTime());
         if (Gdx.input.isKeyPressed(Keys.RIGHT)) jet.setX(jet.getX() + 200 * Gdx.graphics.getDeltaTime());
-        if (Gdx.input.isKeyPressed(Keys.SPACE) && jet.canShoot()) {
+        if (Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT) && jet.canShoot()) {
             missiles.add(Missile.fromJet(jet));
             jet.setLastShootTime(System.currentTimeMillis());
         }
@@ -165,24 +191,23 @@ public class JetFightersCore extends ApplicationAdapter {
     }
 
     private void reportNewCoordinatesToServer() {
-        try {
-            String host = InetAddress.getLocalHost().getHostAddress();
-            InetSocketAddress remoteAddress = new InetSocketAddress(host, SERVER_PORT);
-            JetMoveMessage dto = new JetMoveMessage(jet.getX(), jet.getY());
-            ByteBuf byteBuf = Unpooled.copiedBuffer(serialize(dto));
+        JetMoveMessage dto = new JetMoveMessage(jetId, jet.getX(), jet.getY());
+        ByteBuf byteBuf = Unpooled.copiedBuffer(serialize(dto));
+        if (byteBuf.readableBytes() > 0) {
             channel.writeAndFlush(new DatagramPacket(byteBuf, remoteAddress));
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
-    private byte[] serialize(Object obj) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ObjectOutputStream os = new ObjectOutputStream(out);
-        os.writeObject(obj);
-        return out.toByteArray();
+    private byte[] serialize(Object obj) {
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ObjectOutputStream os = new ObjectOutputStream(out);
+            os.writeObject(obj);
+            return out.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new byte[]{};
+        }
     }
 
     @Override

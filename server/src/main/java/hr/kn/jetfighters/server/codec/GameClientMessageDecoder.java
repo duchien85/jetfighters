@@ -1,6 +1,6 @@
 package hr.kn.jetfighters.server.codec;
 
-import com.badlogic.jetfighters.dto.JetMoveMessage;
+import com.badlogic.jetfighters.dto.request.GameClientMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
@@ -11,17 +11,19 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.List;
 
-public class GameClientMessageDecoder extends MessageToMessageDecoder {
+// TODO parse bytes to message in an inteligent way (custom binary, Java serialization, protobuf, json..?)
+// TODO Process message delegating to services, managers, repos etc.
+public class GameClientMessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
     @Override
-    protected void decode(ChannelHandlerContext ctx, Object msg, List out) throws Exception {
-        DatagramPacket packet = (DatagramPacket) msg;
+    protected void decode(ChannelHandlerContext ctx, DatagramPacket packet, List out) throws Exception {
         byte[] bytes = readBytesFromBuffer(packet.content());
         Object payload = deserialize(bytes);
-        if (payload instanceof JetMoveMessage) {
-            // TODO parse bytes to message in an inteligent way (custom binary, Java serialization, protobuf, json..?)
-            JetMoveMessage dto = (JetMoveMessage) payload;
-            // TODO Process message delegating to services, managers, repos etc.
-            System.out.println("Jet is at location: " + dto.getX() + ", " + dto.getY());
+        if (payload instanceof GameClientMessage) {
+            GameClientMessage gameClientMessage = (GameClientMessage) payload;
+            gameClientMessage.setSender(packet.sender());
+            out.add(gameClientMessage);
+        } else {
+            System.out.println("Invalid message reached server: " + payload);
         }
     }
 

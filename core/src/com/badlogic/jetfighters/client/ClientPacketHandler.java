@@ -1,5 +1,8 @@
 package com.badlogic.jetfighters.client;
 
+import com.badlogic.jetfighters.JetFightersCore;
+import com.badlogic.jetfighters.dto.response.GameServerMessage;
+import com.badlogic.jetfighters.dto.response.JoinGameMessageResponse;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -10,6 +13,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 
 public class ClientPacketHandler extends SimpleChannelInboundHandler<DatagramPacket> {
+
+    private JetFightersCore game;
+
+    public ClientPacketHandler(JetFightersCore game) {
+        this.game = game;
+    }
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) throws Exception {
         ByteBuf buf = msg.content();
@@ -18,8 +28,13 @@ public class ClientPacketHandler extends SimpleChannelInboundHandler<DatagramPac
         buf.readBytes(bytes);
         System.out.println("Received packet, length: " + bytes.length);
         Object object = deserialize(bytes);
-        if (object instanceof String && "SUCCESS".equals(object.toString())) {
-            System.out.println("Server ACK SUCCESS");
+
+        // TODO napravit decoder, pa handlere...
+        if (object instanceof GameServerMessage) {
+            JoinGameMessageResponse response = (JoinGameMessageResponse) object;
+            if ("SUCCESS".equals(response.getStatus())) {
+                game.SERVER_CONNECTED = true;
+            }
         }
     }
 

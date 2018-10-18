@@ -1,6 +1,7 @@
 package hr.kn.jetfighters.server;
 
 import hr.kn.jetfighters.server.codec.GameClientMessageDecoder;
+import hr.kn.jetfighters.server.codec.GameClientMessageHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -40,7 +41,7 @@ public class UdpServer {
             public void initChannel(final NioDatagramChannel ch) {
                 ChannelPipeline p = ch.pipeline();
                 p.addLast(new GameClientMessageDecoder());
-                //p.addLast(new ServerPacketHandler());
+                p.addLast(new GameClientMessageHandler());
             }
         };
     }
