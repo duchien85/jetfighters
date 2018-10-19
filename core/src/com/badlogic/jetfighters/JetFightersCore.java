@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.jetfighters.client.UdpClient;
 import com.badlogic.jetfighters.dto.request.JetMoveMessage;
 import com.badlogic.jetfighters.dto.request.JoinGameMessage;
+import com.badlogic.jetfighters.dto.serialization.GameMessageSerde;
 import com.badlogic.jetfighters.model.Jet;
 import com.badlogic.jetfighters.model.Meteor;
 import com.badlogic.jetfighters.model.Missile;
@@ -102,7 +103,7 @@ public class JetFightersCore extends ApplicationAdapter {
         jets.add(jet);
 
         JoinGameMessage dto = new JoinGameMessage(jetId);
-        ByteBuf byteBuf = Unpooled.copiedBuffer(serialize(dto));
+        ByteBuf byteBuf = Unpooled.copiedBuffer(GameMessageSerde.serialize(dto));
         if (byteBuf.readableBytes() > 0) {
             ChannelFuture joinGameFuture = channel.writeAndFlush(new DatagramPacket(byteBuf, remoteAddress));
             joinGameFuture.addListener(future -> {
@@ -192,21 +193,9 @@ public class JetFightersCore extends ApplicationAdapter {
 
     private void reportNewCoordinatesToServer() {
         JetMoveMessage dto = new JetMoveMessage(jetId, jet.getX(), jet.getY());
-        ByteBuf byteBuf = Unpooled.copiedBuffer(serialize(dto));
+        ByteBuf byteBuf = Unpooled.copiedBuffer(GameMessageSerde.serialize(dto));
         if (byteBuf.readableBytes() > 0) {
             channel.writeAndFlush(new DatagramPacket(byteBuf, remoteAddress));
-        }
-    }
-
-    private byte[] serialize(Object obj) {
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            ObjectOutputStream os = new ObjectOutputStream(out);
-            os.writeObject(obj);
-            return out.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new byte[]{};
         }
     }
 

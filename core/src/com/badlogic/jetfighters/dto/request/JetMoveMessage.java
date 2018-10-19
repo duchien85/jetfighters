@@ -1,6 +1,7 @@
 package com.badlogic.jetfighters.dto.request;
 
 public class JetMoveMessage extends GameClientMessage {
+
     private String jetId;
     private float x;
     private float y;
