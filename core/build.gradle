@@ -11,5 +11,6 @@ eclipse.project {
 }
 
 dependencies {
+    compile group: 'com.google.guava', name: 'guava', version: '26.0-jre'
     compile group: 'io.netty', name: 'netty-all', version: '4.1.30.Final'
 }

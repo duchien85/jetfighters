@@ -1,17 +1,16 @@
-package com.badlogic.jetfighters;
+package com.badlogic.jetfighters.screens;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.jetfighters.client.UdpClient;
+import com.badlogic.jetfighters.JetFightersGame;
 import com.badlogic.jetfighters.dto.request.JetMoveMessage;
-import com.badlogic.jetfighters.dto.request.JoinGameMessage;
 import com.badlogic.jetfighters.dto.serialization.GameMessageSerde;
 import com.badlogic.jetfighters.model.Jet;
 import com.badlogic.jetfighters.model.Meteor;
@@ -19,35 +18,25 @@ import com.badlogic.jetfighters.model.Missile;
 import com.badlogic.jetfighters.render.JetRenderer;
 import com.badlogic.jetfighters.render.MeteorRenderer;
 import com.badlogic.jetfighters.render.MissileRenderer;
+import com.google.common.eventbus.EventBus;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.socket.DatagramPacket;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.Random;
 
-public class JetFightersCore extends ApplicationAdapter {
+public class GameScreen implements Screen {
 
-    public boolean SERVER_CONNECTED = false;
+    private EventBus eventBus = new EventBus();
 
+    private JetFightersGame game;
     private String jetId;
-
-    public JetFightersCore(String jetId) {
-        this.jetId = jetId;
-    }
 
     private Random random = new Random();
 
     private InetSocketAddress remoteAddress;
-    private final Integer SERVER_PORT = 9956;
 
     private SpriteBatch batch;
     private OrthographicCamera camera;
@@ -67,19 +56,9 @@ public class JetFightersCore extends ApplicationAdapter {
     private long METEOR_SPWAN_TIME = 3000;
     private long lastMeteorTime = 0;
 
-    private UdpClient client = new UdpClient();
-    private Channel channel;
-
-    @Override
-    public void create() {
-        // connect to UDP server
-        try {
-            String host = InetAddress.getLocalHost().getHostAddress();
-            channel = client.start(this);
-            remoteAddress = new InetSocketAddress(host, SERVER_PORT);
-        } catch (InterruptedException | UnknownHostException e) {
-            e.printStackTrace();
-        }
+    public GameScreen(JetFightersGame game, String jetId) {
+        this.game = game;
+        this.jetId = jetId;
 
         // load the explosion sound effect and the airplane background "music"
         explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.wav"));
@@ -101,23 +80,10 @@ public class JetFightersCore extends ApplicationAdapter {
         jets = new Array<>();
         meteors = new Array<>();
         jets.add(jet);
-
-        JoinGameMessage dto = new JoinGameMessage(jetId);
-        ByteBuf byteBuf = Unpooled.copiedBuffer(GameMessageSerde.serialize(dto));
-        if (byteBuf.readableBytes() > 0) {
-            ChannelFuture joinGameFuture = channel.writeAndFlush(new DatagramPacket(byteBuf, remoteAddress));
-            joinGameFuture.addListener(future -> {
-                while (!SERVER_CONNECTED) {
-                    // We're waiting for success connection to server
-                    System.out.println("Server not connected...");
-                }
-                System.out.println("Connection acquired!");
-            });
-        }
     }
 
     @Override
-    public void render() {
+    public void render(float delta) {
         // Clear screen and fill with dark blue
         Gdx.gl.glClearColor(0, 0.2f, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -195,13 +161,37 @@ public class JetFightersCore extends ApplicationAdapter {
         JetMoveMessage dto = new JetMoveMessage(jetId, jet.getX(), jet.getY());
         ByteBuf byteBuf = Unpooled.copiedBuffer(GameMessageSerde.serialize(dto));
         if (byteBuf.readableBytes() > 0) {
-            channel.writeAndFlush(new DatagramPacket(byteBuf, remoteAddress));
+            game.channel.writeAndFlush(new DatagramPacket(byteBuf, remoteAddress));
         }
     }
 
     @Override
+    public void show() {
+
+    }
+
+    @Override
+    public void resize(int width, int height) {
+
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
+
+    @Override
     public void dispose() {
-        // dispose of all the native resources
         explosionSound.dispose();
         airplaneMusic.dispose();
         batch.dispose();

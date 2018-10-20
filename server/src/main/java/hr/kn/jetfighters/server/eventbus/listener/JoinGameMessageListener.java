@@ -14,7 +14,7 @@ public class JoinGameMessageListener implements ServerMessageListener<JoinGameMe
     @Override
     public void handle(JoinGameMessage message) {
         System.out.println("Player " + message.getDesiredJetId() + " is requesting to join a game.");
-        JoinGameMessageResponse response = new JoinGameMessageResponse("SUCCESS");
+        JoinGameMessageResponse response = new JoinGameMessageResponse(message.getDesiredJetId(), "SUCCESS");
         ByteBuf bufResponse = Unpooled.copiedBuffer(GameMessageSerde.serialize((response)));
         message.getCtx().channel().writeAndFlush(new DatagramPacket(bufResponse, message.getSender()));
     }
