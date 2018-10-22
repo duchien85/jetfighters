@@ -24,9 +24,14 @@ public class Jet implements Renderable {
         this.x = x;
         this.y = y;
         this.rectangle = new Rectangle(x, y, 64, 53);
-        this.textures.put(0, new Texture(Gdx.files.internal("fighter/1.png")));
-        this.textures.put(1, new Texture(Gdx.files.internal("fighter/2.png")));
-        this.textures.put(2, new Texture(Gdx.files.internal("fighter/3.png")));
+
+        try {
+            this.textures.put(0, new Texture(Gdx.files.internal("fighter/1.png")));
+            this.textures.put(1, new Texture(Gdx.files.internal("fighter/2.png")));
+            this.textures.put(2, new Texture(Gdx.files.internal("fighter/3.png")));
+        } catch (Exception e) {
+            // TODO stupid Exception ignore for server which doesn't have textures
+        }
     }
 
     public boolean canShoot() {

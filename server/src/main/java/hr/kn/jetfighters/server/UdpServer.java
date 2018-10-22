@@ -1,10 +1,11 @@
 package hr.kn.jetfighters.server;
 
 import com.google.common.eventbus.EventBus;
-import hr.kn.jetfighters.server.codec.GameClientMessageDecoder;
-import hr.kn.jetfighters.server.codec.GameClientMessageHandler;
-import hr.kn.jetfighters.server.eventbus.listener.JetMoveMessageListener;
-import hr.kn.jetfighters.server.eventbus.listener.JoinGameMessageListener;
+import hr.kn.jetfighters.server.game.GameState;
+import hr.kn.jetfighters.server.network.codec.GameClientMessageDecoder;
+import hr.kn.jetfighters.server.network.codec.GameClientMessageHandler;
+import hr.kn.jetfighters.server.network.eventbus.listener.JetMoveMessageListener;
+import hr.kn.jetfighters.server.network.eventbus.listener.JoinGameMessageListener;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -18,6 +19,7 @@ import java.net.InetAddress;
 
 public class UdpServer {
 
+    private GameState gameState = new GameState();
     private EventBus eventBus = new EventBus();
 
     private final Integer SERVER_PORT = 9956;

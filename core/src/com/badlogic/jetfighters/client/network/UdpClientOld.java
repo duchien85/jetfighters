@@ -1,4 +1,4 @@
-package com.badlogic.jetfighters.client;
+package com.badlogic.jetfighters.client.network;
 
 import com.badlogic.jetfighters.dto.JetFighterDto;
 

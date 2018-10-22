@@ -1,4 +1,4 @@
-package hr.kn.jetfighters.server;
+package hr.kn.jetfighters.server.network;
 
 import com.badlogic.jetfighters.dto.JetFighterDto;
 import io.netty.buffer.ByteBuf;

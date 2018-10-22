@@ -1,4 +1,4 @@
-package hr.kn.jetfighters.server.codec;
+package hr.kn.jetfighters.server.network.codec;
 
 import com.badlogic.jetfighters.dto.request.GameClientMessage;
 import com.google.common.eventbus.EventBus;

@@ -1,8 +1,8 @@
-package com.badlogic.jetfighters.client;
+package com.badlogic.jetfighters.client.network;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.jetfighters.JetFightersGame;
-import com.badlogic.jetfighters.dto.response.GameServerMessage;
+import com.badlogic.jetfighters.dto.response.JetMoveMessageResponse;
 import com.badlogic.jetfighters.dto.response.JoinGameMessageResponse;
 import com.badlogic.jetfighters.dto.serialization.GameMessageSerde;
 import com.badlogic.jetfighters.screens.GameScreen;
@@ -32,7 +32,7 @@ public class ClientPacketHandler extends SimpleChannelInboundHandler<DatagramPac
         Object object = GameMessageSerde.deserialize(bytes);
 
         // TODO napravit decoder, pa handlere...
-        if (object instanceof GameServerMessage) {
+        if (object instanceof JoinGameMessageResponse) {
             JoinGameMessageResponse response = (JoinGameMessageResponse) object;
             if ("SUCCESS".equals(response.getStatus())) {
                 udpClient.state = UdpClientState.CONNECTED;
@@ -41,6 +41,10 @@ public class ClientPacketHandler extends SimpleChannelInboundHandler<DatagramPac
                     System.out.print("Successful server connection");
                 });
             }
+        } else if (object instanceof JetMoveMessageResponse) {
+            JetMoveMessageResponse response = (JetMoveMessageResponse) object;
+            System.out.print("Jet " + response.getJetId() + " at location " + response.getX() + ", " + response.getY());
+            JetFightersGame.eventBus.post(object);
         }
     }
 

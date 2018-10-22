@@ -10,20 +10,18 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.jetfighters.JetFightersGame;
+import com.badlogic.jetfighters.client.eventbus.JetMoveMessageResponseListener;
 import com.badlogic.jetfighters.model.Jet;
 import com.badlogic.jetfighters.model.Meteor;
 import com.badlogic.jetfighters.model.Missile;
 import com.badlogic.jetfighters.render.JetRenderer;
 import com.badlogic.jetfighters.render.MeteorRenderer;
 import com.badlogic.jetfighters.render.MissileRenderer;
-import com.google.common.eventbus.EventBus;
 
 import java.util.Iterator;
 import java.util.Random;
 
 public class GameScreen implements Screen {
-
-    private EventBus eventBus = new EventBus();
 
     private JetFightersGame game;
     private String jetId;
@@ -37,7 +35,7 @@ public class GameScreen implements Screen {
     private Music airplaneMusic;
 
     private Jet jet;
-    private Array<Jet> jets;
+    public Array<Jet> jets;
     private Array<Missile> missiles;
     private Array<Meteor> meteors;
 
@@ -49,6 +47,7 @@ public class GameScreen implements Screen {
     private long lastMeteorTime = 0;
 
     public GameScreen(JetFightersGame game, String jetId) {
+        JetFightersGame.eventBus.register(new JetMoveMessageResponseListener(this));
         this.game = game;
         this.jetId = jetId;
 
@@ -93,10 +92,11 @@ public class GameScreen implements Screen {
         meteorRenderer.render(meteors);
 
         // process keyboard input for jet1
-        if (Gdx.input.isKeyPressed(Keys.UP)) jet.setY(jet.getY() + 200 * Gdx.graphics.getDeltaTime());
-        if (Gdx.input.isKeyPressed(Keys.DOWN)) jet.setY(jet.getY() - 200 * Gdx.graphics.getDeltaTime());
-        if (Gdx.input.isKeyPressed(Keys.LEFT)) jet.setX(jet.getX() - 200 * Gdx.graphics.getDeltaTime());
-        if (Gdx.input.isKeyPressed(Keys.RIGHT)) jet.setX(jet.getX() + 200 * Gdx.graphics.getDeltaTime());
+        Jet newJetLocation = new Jet(jet.getJetId(), jet.getX(), jet.getY());
+        if (Gdx.input.isKeyPressed(Keys.UP)) newJetLocation.setY(newJetLocation.getY() + 200 * Gdx.graphics.getDeltaTime());
+        if (Gdx.input.isKeyPressed(Keys.DOWN)) newJetLocation.setY(newJetLocation.getY() - 200 * Gdx.graphics.getDeltaTime());
+        if (Gdx.input.isKeyPressed(Keys.LEFT)) newJetLocation.setX(newJetLocation.getX() - 200 * Gdx.graphics.getDeltaTime());
+        if (Gdx.input.isKeyPressed(Keys.RIGHT)) newJetLocation.setX(newJetLocation.getX() + 200 * Gdx.graphics.getDeltaTime());
         if (Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT) && jet.canShoot()) {
             missiles.add(Missile.fromJet(jet));
             jet.setLastShootTime(System.currentTimeMillis());
@@ -142,7 +142,7 @@ public class GameScreen implements Screen {
             spawnNewMeteor();
             lastMeteorTime = System.currentTimeMillis();
         }
-        game.client.moveJet(jetId, jet.getX(), jet.getY());
+        game.client.moveJet(jetId, newJetLocation.getX(), newJetLocation.getY());
     }
 
     private void spawnNewMeteor() {

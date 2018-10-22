@@ -1,5 +1,6 @@
 package com.badlogic.jetfighters.client;
 
+import com.badlogic.jetfighters.client.network.UdpClient;
 import com.badlogic.jetfighters.dto.request.JetMoveMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

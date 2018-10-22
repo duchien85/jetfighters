@@ -1,6 +1,7 @@
 package com.badlogic.jetfighters.dto.request;
 
 public class JoinGameMessage extends GameClientMessage {
+
     private String desiredJetId;
 
     public JoinGameMessage(String desiredJetId) {

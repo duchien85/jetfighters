@@ -3,7 +3,7 @@ package com.badlogic.jetfighters;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.jetfighters.client.UdpClient;
+import com.badlogic.jetfighters.client.network.UdpClient;
 import com.badlogic.jetfighters.screens.MainMenuScreen;
 import com.google.common.eventbus.EventBus;
 
@@ -13,7 +13,7 @@ public class JetFightersGame extends Game {
     public BitmapFont font;
 
     private String jetId;
-    public EventBus eventBus = new EventBus();
+    public static EventBus eventBus = new EventBus();
     public UdpClient client = new UdpClient(this, eventBus);
 
     public JetFightersGame(String jetId) {
