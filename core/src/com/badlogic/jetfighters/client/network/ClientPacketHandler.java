@@ -43,7 +43,6 @@ public class ClientPacketHandler extends SimpleChannelInboundHandler<DatagramPac
             }
         } else if (object instanceof JetMoveMessageResponse) {
             JetMoveMessageResponse response = (JetMoveMessageResponse) object;
-            System.out.print("Jet " + response.getJetId() + " at location " + response.getX() + ", " + response.getY());
             JetFightersGame.eventBus.post(object);
         }
     }

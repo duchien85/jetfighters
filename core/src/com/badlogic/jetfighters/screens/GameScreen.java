@@ -113,7 +113,7 @@ public class GameScreen implements Screen {
         // a sound effect as well.
         for (Iterator<Missile> iter = missiles.iterator(); iter.hasNext(); ) {
             Missile missile = iter.next();
-            missile.setY(missile.getY() + 200 * Gdx.graphics.getDeltaTime());
+            missile.setY(missile.getY() + 600 * Gdx.graphics.getDeltaTime());
             if (missile.getY() + 32 > 800) iter.remove();
         }
 

@@ -14,7 +14,6 @@ public class JetMoveMessageListener implements ServerMessageListener<JetMoveMess
     @Subscribe
     @Override
     public void handle(JetMoveMessage message) {
-        System.out.println("Jet " + message.getJetId() + " at location " + message.getX() + ", " + message.getY());
         GameState.jetManager.updateJetLocation(message.getJetId(), message.getX(), message.getY());
 
         JetMoveMessageResponse response = new JetMoveMessageResponse(message.getJetId(), message.getX(), message.getY());
