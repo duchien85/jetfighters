@@ -8,6 +8,7 @@ import com.badlogic.jetfighters.screens.MainMenuScreen;
 import com.google.common.eventbus.EventBus;
 import io.netty.channel.Channel;
 
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
 public class JetFightersGame extends Game {
@@ -15,14 +16,13 @@ public class JetFightersGame extends Game {
     public SpriteBatch batch;
     public BitmapFont font;
     public Channel channel;
+    public InetSocketAddress remoteAddress;
+    private String jetId;
     public EventBus eventBus = new EventBus();
     public UdpClient client = new UdpClient(this, eventBus);
 
-    private String jetId;
-
     public JetFightersGame(String jetId) {
         // TODO register real listeners on eventbus
-        eventBus.register("");
         this.jetId = jetId;
     }
 

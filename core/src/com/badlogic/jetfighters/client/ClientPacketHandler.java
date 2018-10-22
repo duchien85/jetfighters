@@ -1,5 +1,6 @@
 package com.badlogic.jetfighters.client;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.jetfighters.JetFightersGame;
 import com.badlogic.jetfighters.dto.response.GameServerMessage;
 import com.badlogic.jetfighters.dto.response.JoinGameMessageResponse;
@@ -9,7 +10,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
-import io.netty.util.AttributeKey;
 
 public class ClientPacketHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
@@ -33,9 +33,10 @@ public class ClientPacketHandler extends SimpleChannelInboundHandler<DatagramPac
         if (object instanceof GameServerMessage) {
             JoinGameMessageResponse response = (JoinGameMessageResponse) object;
             if ("SUCCESS".equals(response.getStatus())) {
-                game.setScreen(new GameScreen(game, response.getJetId()));
-                game.dispose();
-                System.out.print("Succ server connect with user");
+                Gdx.app.postRunnable(() -> {
+                    game.setScreen(new GameScreen(game, response.getJetId()));
+                    System.out.print("Succ server connect with user");
+                });
             }
         }
     }

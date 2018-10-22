@@ -21,7 +21,6 @@ public class MainMenuScreen implements Screen {
     private final JetFightersGame game;
     private final OrthographicCamera camera;
     private String jetId;
-    private InetSocketAddress remoteAddress;
 
     public MainMenuScreen(final JetFightersGame game, final String jetId) throws UnknownHostException {
         this.game = game;
@@ -29,12 +28,20 @@ public class MainMenuScreen implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 480);
         String host = InetAddress.getLocalHost().getHostAddress();
-        this.remoteAddress = new InetSocketAddress(host, 9956);
+        game.remoteAddress = new InetSocketAddress(host, 9956);
     }
 
     @Override
     public void show() {
-
+        try {
+            game.channel = connectToServer();
+            JoinGameMessage dto = new JoinGameMessage(jetId);
+            ByteBuf byteBuf = Unpooled.copiedBuffer(GameMessageSerde.serialize(dto));
+            game.channel.writeAndFlush(new DatagramPacket(byteBuf, game.remoteAddress));
+            // Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -49,26 +56,13 @@ public class MainMenuScreen implements Screen {
         game.font.draw(game.batch, "Welcome to JetFighters!", 100, 150);
         game.font.draw(game.batch, "Acquiring connection to server...", 100, 100);
         game.batch.end();
-
-        for (int i = 0; i < 5; i++) {
-            try {
-                game.channel = connectToServer();
-                JoinGameMessage dto = new JoinGameMessage(jetId);
-                ByteBuf byteBuf = Unpooled.copiedBuffer(GameMessageSerde.serialize(dto));
-                game.channel.writeAndFlush(new DatagramPacket(byteBuf, remoteAddress));
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println("Attempt " + i + " to connect failed! Retrying...");
-        }
     }
 
     private Channel connectToServer() throws InterruptedException {
         Channel channel = game.client.start();
         JoinGameMessage dto = new JoinGameMessage(jetId);
         ByteBuf byteBuf = Unpooled.copiedBuffer(GameMessageSerde.serialize(dto));
-        return channel.writeAndFlush(new DatagramPacket(byteBuf, remoteAddress)).sync().channel();
+        return channel.writeAndFlush(new DatagramPacket(byteBuf, game.remoteAddress)).sync().channel();
     }
 
     @Override

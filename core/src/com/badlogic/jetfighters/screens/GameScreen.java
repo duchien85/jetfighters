@@ -23,7 +23,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.socket.DatagramPacket;
 
-import java.net.InetSocketAddress;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -35,8 +34,6 @@ public class GameScreen implements Screen {
     private String jetId;
 
     private Random random = new Random();
-
-    private InetSocketAddress remoteAddress;
 
     private SpriteBatch batch;
     private OrthographicCamera camera;
@@ -161,7 +158,7 @@ public class GameScreen implements Screen {
         JetMoveMessage dto = new JetMoveMessage(jetId, jet.getX(), jet.getY());
         ByteBuf byteBuf = Unpooled.copiedBuffer(GameMessageSerde.serialize(dto));
         if (byteBuf.readableBytes() > 0) {
-            game.channel.writeAndFlush(new DatagramPacket(byteBuf, remoteAddress));
+            game.channel.writeAndFlush(new DatagramPacket(byteBuf, game.remoteAddress));
         }
     }
 
