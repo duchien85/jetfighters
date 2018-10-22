@@ -13,9 +13,11 @@ import io.netty.channel.socket.DatagramPacket;
 
 public class ClientPacketHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
+    private final UdpClient udpClient;
     private final JetFightersGame game;
 
-    public ClientPacketHandler(JetFightersGame game) {
+    public ClientPacketHandler(UdpClient udpClient, JetFightersGame game) {
+        this.udpClient = udpClient;
         this.game = game;
     }
 
@@ -33,9 +35,10 @@ public class ClientPacketHandler extends SimpleChannelInboundHandler<DatagramPac
         if (object instanceof GameServerMessage) {
             JoinGameMessageResponse response = (JoinGameMessageResponse) object;
             if ("SUCCESS".equals(response.getStatus())) {
+                udpClient.state = UdpClientState.CONNECTED;
                 Gdx.app.postRunnable(() -> {
                     game.setScreen(new GameScreen(game, response.getJetId()));
-                    System.out.print("Succ server connect with user");
+                    System.out.print("Successful server connection");
                 });
             }
         }

@@ -6,17 +6,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.jetfighters.client.UdpClient;
 import com.badlogic.jetfighters.screens.MainMenuScreen;
 import com.google.common.eventbus.EventBus;
-import io.netty.channel.Channel;
-
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 
 public class JetFightersGame extends Game {
 
     public SpriteBatch batch;
     public BitmapFont font;
-    public Channel channel;
-    public InetSocketAddress remoteAddress;
+
     private String jetId;
     public EventBus eventBus = new EventBus();
     public UdpClient client = new UdpClient(this, eventBus);
@@ -27,13 +22,14 @@ public class JetFightersGame extends Game {
     }
 
     public void create() {
-        batch = new SpriteBatch();
-        // Use LibGDX's default Arial font.
-        font = new BitmapFont();
         try {
+            client.start();
+            batch = new SpriteBatch();
+            font = new BitmapFont(); // Use LibGDX's default Arial font.
             this.setScreen(new MainMenuScreen(this, jetId));
-        } catch (UnknownHostException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            System.exit(0);
         }
     }
 

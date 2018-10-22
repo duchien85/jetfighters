@@ -10,8 +10,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.jetfighters.JetFightersGame;
-import com.badlogic.jetfighters.dto.request.JetMoveMessage;
-import com.badlogic.jetfighters.dto.serialization.GameMessageSerde;
 import com.badlogic.jetfighters.model.Jet;
 import com.badlogic.jetfighters.model.Meteor;
 import com.badlogic.jetfighters.model.Missile;
@@ -19,9 +17,6 @@ import com.badlogic.jetfighters.render.JetRenderer;
 import com.badlogic.jetfighters.render.MeteorRenderer;
 import com.badlogic.jetfighters.render.MissileRenderer;
 import com.google.common.eventbus.EventBus;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.socket.DatagramPacket;
 
 import java.util.Iterator;
 import java.util.Random;
@@ -147,19 +142,11 @@ public class GameScreen implements Screen {
             spawnNewMeteor();
             lastMeteorTime = System.currentTimeMillis();
         }
-        reportNewCoordinatesToServer();
+        game.client.moveJet(jetId, jet.getX(), jet.getY());
     }
 
     private void spawnNewMeteor() {
         meteors.add(new Meteor(random.nextInt((800) + 1), 600));
-    }
-
-    private void reportNewCoordinatesToServer() {
-        JetMoveMessage dto = new JetMoveMessage(jetId, jet.getX(), jet.getY());
-        ByteBuf byteBuf = Unpooled.copiedBuffer(GameMessageSerde.serialize(dto));
-        if (byteBuf.readableBytes() > 0) {
-            game.channel.writeAndFlush(new DatagramPacket(byteBuf, game.remoteAddress));
-        }
     }
 
     @Override
