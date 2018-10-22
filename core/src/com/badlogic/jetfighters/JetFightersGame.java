@@ -24,8 +24,8 @@ public class JetFightersGame extends Game {
     public void create() {
         try {
             client.start();
-            batch = new SpriteBatch();
-            font = new BitmapFont(); // Use LibGDX's default Arial font.
+            this.batch = new SpriteBatch();
+            this.font = new BitmapFont(); // Use LibGDX's default Arial font.
             this.setScreen(new MainMenuScreen(this, jetId));
         } catch (Exception e) {
             e.printStackTrace();
