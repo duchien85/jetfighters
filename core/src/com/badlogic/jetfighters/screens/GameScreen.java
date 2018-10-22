@@ -7,6 +7,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.jetfighters.JetFightersGame;
@@ -26,9 +27,10 @@ public class GameScreen implements Screen {
     private JetFightersGame game;
     private String jetId;
 
+    private BitmapFont font;
     private Random random = new Random();
 
-    private SpriteBatch batch;
+    private SpriteBatch textBatch = new SpriteBatch();
     private OrthographicCamera camera;
 
     private Sound explosionSound;
@@ -46,10 +48,13 @@ public class GameScreen implements Screen {
     private long METEOR_SPWAN_TIME = 3000;
     private long lastMeteorTime = 0;
 
+    private int numberOfHitMeteors = 0;
+
     public GameScreen(JetFightersGame game, String jetId) {
         JetFightersGame.eventBus.register(new JetMoveMessageResponseListener(this));
         this.game = game;
         this.jetId = jetId;
+        this.font = new BitmapFont();
 
         // load the explosion sound effect and the airplane background "music"
         explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.wav"));
@@ -61,10 +66,9 @@ public class GameScreen implements Screen {
 
         // create the camera and the SpriteBatch
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 480);
-        batch = new SpriteBatch();
+        camera.setToOrtho(false, 1024, 768);
 
-        jet = new Jet(jetId, 800 / 2 - 64 / 2, 20);
+        jet = new Jet(jetId, 1024 / 2 - 64 / 2, 20);
 
         // create containers and spawn the first jet
         missiles = new Array<>();
@@ -84,29 +88,38 @@ public class GameScreen implements Screen {
 
         // tell the SpriteBatch to render in the
         // coordinate system specified by the camera.
-        batch.setProjectionMatrix(camera.combined);
+        //batch.setProjectionMatrix(camera.combined);
+        textBatch.setProjectionMatrix(camera.combined);
 
         // render everything, should be in same batch?
         jetRenderer.render(jets);
         missileRenderer.render(missiles);
         meteorRenderer.render(meteors);
 
+        this.textBatch.begin();
+        this.font.draw(this.textBatch, "Destroyed meteors: " + numberOfHitMeteors, 5, 20);
+        this.textBatch.end();
+
         // process keyboard input for jet1
         Jet newJetLocation = new Jet(jet.getJetId(), jet.getX(), jet.getY());
-        if (Gdx.input.isKeyPressed(Keys.UP)) newJetLocation.setY(newJetLocation.getY() + 200 * Gdx.graphics.getDeltaTime());
-        if (Gdx.input.isKeyPressed(Keys.DOWN)) newJetLocation.setY(newJetLocation.getY() - 200 * Gdx.graphics.getDeltaTime());
-        if (Gdx.input.isKeyPressed(Keys.LEFT)) newJetLocation.setX(newJetLocation.getX() - 200 * Gdx.graphics.getDeltaTime());
-        if (Gdx.input.isKeyPressed(Keys.RIGHT)) newJetLocation.setX(newJetLocation.getX() + 200 * Gdx.graphics.getDeltaTime());
+        if (Gdx.input.isKeyPressed(Keys.UP))
+            newJetLocation.setY(newJetLocation.getY() + 200 * Gdx.graphics.getDeltaTime());
+        if (Gdx.input.isKeyPressed(Keys.DOWN))
+            newJetLocation.setY(newJetLocation.getY() - 200 * Gdx.graphics.getDeltaTime());
+        if (Gdx.input.isKeyPressed(Keys.LEFT))
+            newJetLocation.setX(newJetLocation.getX() - 200 * Gdx.graphics.getDeltaTime());
+        if (Gdx.input.isKeyPressed(Keys.RIGHT))
+            newJetLocation.setX(newJetLocation.getX() + 200 * Gdx.graphics.getDeltaTime());
         if (Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT) && jet.canShoot()) {
             missiles.add(Missile.fromJet(jet));
             jet.setLastShootTime(System.currentTimeMillis());
         }
 
         // make sure the jet stays within the screen bounds
-        if (jet.getX() < 0) jet.setX(0);
-        if (jet.getX() > 800 - 64) jet.setX(800 - 64);
-        if (jet.getY() < 0) jet.setY(0);
-        if (jet.getY() > 480 - 53) jet.setY(480 - 53);
+        if (newJetLocation.getX() < 0) newJetLocation.setX(0);
+        if (newJetLocation.getX() > 1024 - 64) newJetLocation.setX(1024 - 64);
+        if (newJetLocation.getY() < 0) newJetLocation.setY(0);
+        if (newJetLocation.getY() > 768 - 53) newJetLocation.setY(768 - 53);
 
         // move missiles, remove any that are beneath the top edge of
         // the screen or that hit the enemy. In the latter case we play back
@@ -127,6 +140,7 @@ public class GameScreen implements Screen {
                     explosionSound.play();
                     iter.remove();
                     iterMissile.remove();
+                    numberOfHitMeteors++;
                 }
             }
             if (meteor.getRectangle().overlaps(jet.getRectangle())) {
@@ -178,6 +192,6 @@ public class GameScreen implements Screen {
     public void dispose() {
         explosionSound.dispose();
         airplaneMusic.dispose();
-        batch.dispose();
+        textBatch.dispose();
     }
 }
