@@ -102,10 +102,10 @@ public class GameScreen implements Screen {
 
         // process start new game
         if (GAME_OVER && Gdx.input.isKeyPressed(Keys.ANY_KEY)) {
-            game.setScreen(new MainMenuScreen(game, jetId));
+            game.setScreen(new MainMenuScreen(game));
         }
 
-        // process keyboard input for jet1
+        // process keyboard input and simulate movement that will be sent to server
         Jet newJetLocation = new Jet(jet.getJetId(), jet.getX(), jet.getY());
         if (Gdx.input.isKeyPressed(Keys.UP))
             newJetLocation.setY(newJetLocation.getY() + 200 * Gdx.graphics.getDeltaTime());

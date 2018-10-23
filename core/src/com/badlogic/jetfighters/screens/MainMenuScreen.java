@@ -8,27 +8,34 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.jetfighters.JetFightersGame;
 import com.badlogic.jetfighters.client.eventbus.JoinGameMessageResponseListener;
 
+import java.util.Random;
+
 public class MainMenuScreen implements Screen {
 
     private final JetFightersGame game;
     private final OrthographicCamera camera;
 
-    private String jetId;
+    public String jetId;
+    public boolean jetIdPicked = false;
     private Texture pilotTexture = new Texture(Gdx.files.internal("jet_pilot.png"));
 
     private int attemptNumber = 1;
-    private long lastConnectionAttemptTimestamp = System.currentTimeMillis();
+    public long lastConnectionAttemptTimestamp;
 
-    public MainMenuScreen(final JetFightersGame game, final String jetId) {
+    private Random random = new Random();
+
+    public MainMenuScreen(final JetFightersGame game) {
         JetFightersGame.eventBus.register(new JoinGameMessageResponseListener(game));
         this.game = game;
-        this.jetId = jetId;
+        this.jetId = "Player" + random.nextInt();
         this.camera = new OrthographicCamera();
         this.camera.setToOrtho(false, 1024, 768);
     }
 
     @Override
     public void show() {
+        JetIdInputListener listener = new JetIdInputListener(this);
+        Gdx.input.getTextInput(listener, "Enter your Jet Name:", jetId, "");
     }
 
     @Override
@@ -42,9 +49,12 @@ public class MainMenuScreen implements Screen {
         game.batch.begin();
         game.batch.draw(pilotTexture, 162, 100);
         game.font.draw(game.batch, "Welcome to JetFighters!", 100, 150);
-        game.font.draw(game.batch, "Acquiring connection to server... [attempt " + attemptNumber + "]", 100, 100);
+        if (jetIdPicked) {
+            game.font.draw(game.batch, "Entering game as " + jetId, 100, 100);
+            game.font.draw(game.batch, "Acquiring connection to server... [attempt " + attemptNumber + "]", 100, 80);
+            tryToReconnectToServer();
+        }
         game.batch.end();
-        tryToReconnectToServer();
     }
 
     private void tryToReconnectToServer() {

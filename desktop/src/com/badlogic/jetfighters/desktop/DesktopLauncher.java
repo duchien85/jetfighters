@@ -10,6 +10,6 @@ public class DesktopLauncher {
         config.title = "JetFighters";
         config.width = 1024;
         config.height = 768;
-        new LwjglApplication(new JetFightersGame("Marijan"), config); // TODO read ID from command line args
+        new LwjglApplication(new JetFightersGame(), config); // TODO read ID from command line args
     }
 }
