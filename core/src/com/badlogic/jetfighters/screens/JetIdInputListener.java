@@ -14,16 +14,16 @@ public class JetIdInputListener implements Input.TextInputListener {
     public void input(String jetId) {
         System.out.println("Entered JetId is " + jetId);
         this.screen.jetId = jetId;
-        proceedWithMainMenu();
+        proceeedWithMainMenu();
     }
 
     @Override
     public void canceled() {
         System.out.println("Using default JetId");
-        proceedWithMainMenu();
+        proceeedWithMainMenu();
     }
 
-    private void proceedWithMainMenu() {
+    private void proceeedWithMainMenu() {
         this.screen.jetIdPicked = true;
         this.screen.lastConnectionAttemptTimestamp = System.currentTimeMillis();
     }
