@@ -15,7 +15,7 @@ public class NewPlayerJoinedMessageResponseListener {
     @Subscribe
     public void handle(NewPlayerJoinedResponse message) {
         System.out.println("New player joined: " + message.getJet().getJetId());
-        gameScreen.jets.add(message.getJet());
+        this.gameScreen.jets.add(message.getJet());
     }
 
 }

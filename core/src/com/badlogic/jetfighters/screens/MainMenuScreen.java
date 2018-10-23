@@ -13,7 +13,7 @@ import java.util.Random;
 public class MainMenuScreen implements Screen {
 
     private final JetFightersGame game;
-    private final OrthographicCamera camera;
+    private final OrthographicCamera camera = new OrthographicCamera();;
 
     public String jetId;
     public boolean jetIdPicked = false;
@@ -28,7 +28,6 @@ public class MainMenuScreen implements Screen {
         JetFightersGame.eventBus.register(new JoinGameMessageResponseListener(game));
         this.game = game;
         this.jetId = "Player" + random.nextInt();
-        this.camera = new OrthographicCamera();
         this.camera.setToOrtho(false, 1024, 768);
     }
 
