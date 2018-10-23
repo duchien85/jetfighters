@@ -7,6 +7,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
@@ -31,6 +32,7 @@ public class GameScreen implements Screen {
     private Random random = new Random();
 
     private SpriteBatch textBatch = new SpriteBatch();
+    private SpriteBatch gameOverBatch = new SpriteBatch();
     private OrthographicCamera camera;
 
     private Sound explosionSound;
@@ -45,10 +47,14 @@ public class GameScreen implements Screen {
     private MissileRenderer missileRenderer = new MissileRenderer();
     private MeteorRenderer meteorRenderer = new MeteorRenderer();
 
+    private Texture gameOverTexture = new Texture(Gdx.files.internal("game_over.png"));
+
     private long METEOR_SPWAN_TIME = 3000;
     private long lastMeteorTime = 0;
 
     private int numberOfHitMeteors = 0;
+
+    private boolean GAME_OVER = false;
 
     public GameScreen(JetFightersGame game, String jetId) {
         JetFightersGame.eventBus.register(new JetMoveMessageResponseListener(this));
@@ -144,9 +150,7 @@ public class GameScreen implements Screen {
                 }
             }
             if (meteor.getRectangle().overlaps(jet.getRectangle())) {
-                explosionSound.play();
-                jets.iterator().next();
-                jets.iterator().remove();
+                removeHitJet(jet);
             }
 
             if (meteor.getY() + 143 < 0) iter.remove();
@@ -156,7 +160,26 @@ public class GameScreen implements Screen {
             spawnNewMeteor();
             lastMeteorTime = System.currentTimeMillis();
         }
-        game.client.moveJet(jetId, newJetLocation.getX(), newJetLocation.getY());
+
+
+        if (GAME_OVER) {
+            gameOverBatch.begin();
+            gameOverBatch.draw(gameOverTexture, 1024 / 2 - 204, 768 /2 - 59);
+            gameOverBatch.end();
+        } else {
+            game.client.moveJet(jetId, newJetLocation.getX(), newJetLocation.getY());
+        }
+    }
+
+    private void removeHitJet(Jet hitJet) {
+        explosionSound.play();
+        for (Iterator<Jet> iter = jets.iterator(); iter.hasNext(); ) {
+            Jet jet = iter.next();
+            if (jet.getJetId().equals(hitJet.getJetId())) {
+                iter.remove();
+                GAME_OVER = true;
+            }
+        }
     }
 
     private void spawnNewMeteor() {
