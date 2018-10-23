@@ -29,11 +29,9 @@ public class UdpClient {
     private InetSocketAddress remoteAddress;
 
     private JetFightersGame game;
-    private EventBus eventBus;
 
-    public UdpClient(JetFightersGame game, EventBus eventBus) {
+    public UdpClient(JetFightersGame game) {
         this.game = game;
-        this.eventBus = eventBus;
     }
 
     public void start() throws InterruptedException, UnknownHostException {

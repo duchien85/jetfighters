@@ -23,7 +23,6 @@ public class ClientPacketHandler extends SimpleChannelInboundHandler<DatagramPac
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) throws Exception {
-        // JetFightersGame game = (JetFightersGame) ctx.channel().attr(AttributeKey.newInstance("game")).get();
         ByteBuf buf = msg.content();
         int readable = buf.readableBytes();
         byte[] bytes = new byte[readable];
@@ -42,7 +41,6 @@ public class ClientPacketHandler extends SimpleChannelInboundHandler<DatagramPac
                 });
             }
         } else if (object instanceof JetMoveMessageResponse) {
-            JetMoveMessageResponse response = (JetMoveMessageResponse) object;
             JetFightersGame.eventBus.post(object);
         }
     }

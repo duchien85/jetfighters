@@ -11,9 +11,4 @@ public class JoinGameMessage extends GameClientMessage {
     public String getDesiredJetId() {
         return desiredJetId;
     }
-
-    @Override
-    public int getMessageId() {
-        return 2;
-    }
 }

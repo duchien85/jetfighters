@@ -23,9 +23,4 @@ public class JetMoveMessage extends GameClientMessage {
     public float getY() {
         return y;
     }
-
-    @Override
-    public int getMessageId() {
-        return 1;
-    }
 }

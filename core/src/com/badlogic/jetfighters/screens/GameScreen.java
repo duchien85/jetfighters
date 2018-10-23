@@ -63,24 +63,23 @@ public class GameScreen implements Screen {
         this.font = new BitmapFont();
 
         // load the explosion sound effect and the airplane background "music"
-        explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.wav"));
-        airplaneMusic = Gdx.audio.newMusic(Gdx.files.internal("airplane.mp3"));
+        this.explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.wav"));
+        this.airplaneMusic = Gdx.audio.newMusic(Gdx.files.internal("airplane.mp3"));
 
         // start the playback of the background music immediately
-        airplaneMusic.setLooping(true);
-        airplaneMusic.play();
+        this.airplaneMusic.setLooping(true);
+        this.airplaneMusic.play();
 
         // create the camera and the SpriteBatch
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 1024, 768);
+        this.camera = new OrthographicCamera();
+        this.camera.setToOrtho(false, 1024, 768);
 
-        jet = new Jet(jetId, 1024 / 2 - 64 / 2, 20);
+        this.jet = new Jet(jetId, 1024 / 2 - 64 / 2, 20);
 
         // create containers and spawn the first jet
-        missiles = new Array<>();
-        jets = new Array<>();
-        meteors = new Array<>();
-        jets.add(jet);
+        this.missiles = new Array<>();
+        this.meteors = new Array<>();
+        this.jets = Array.with(jet);
     }
 
     @Override
@@ -106,6 +105,11 @@ public class GameScreen implements Screen {
         this.font.draw(this.textBatch, "Destroyed meteors: " + numberOfHitMeteors, 5, 20);
         this.textBatch.end();
 
+        // process start new game
+        if (GAME_OVER && Gdx.input.isKeyPressed(Keys.ANY_KEY)) {
+            game.setScreen(new MainMenuScreen(game, jetId));
+        }
+
         // process keyboard input for jet1
         Jet newJetLocation = new Jet(jet.getJetId(), jet.getX(), jet.getY());
         if (Gdx.input.isKeyPressed(Keys.UP))
@@ -130,22 +134,22 @@ public class GameScreen implements Screen {
         // move missiles, remove any that are beneath the top edge of
         // the screen or that hit the enemy. In the latter case we play back
         // a sound effect as well.
-        for (Iterator<Missile> iter = missiles.iterator(); iter.hasNext(); ) {
-            Missile missile = iter.next();
+        for (Iterator<Missile> missileIterator = missiles.iterator(); missileIterator.hasNext(); ) {
+            Missile missile = missileIterator.next();
             missile.setY(missile.getY() + 600 * Gdx.graphics.getDeltaTime());
-            if (missile.getY() + 32 > 800) iter.remove();
+            if (missile.getY() + 32 > 800) missileIterator.remove();
         }
 
-        for (Iterator<Meteor> iter = meteors.iterator(); iter.hasNext(); ) {
-            Meteor meteor = iter.next();
+        for (Iterator<Meteor> meteorIterator = meteors.iterator(); meteorIterator.hasNext(); ) {
+            Meteor meteor = meteorIterator.next();
             meteor.setY(meteor.getY() - 200 * Gdx.graphics.getDeltaTime());
 
-            for (Iterator<Missile> iterMissile = missiles.iterator(); iterMissile.hasNext(); ) {
-                Missile missile = iterMissile.next();
+            for (Iterator<Missile> missileIterator = missiles.iterator(); missileIterator.hasNext(); ) {
+                Missile missile = missileIterator.next();
                 if (meteor.getRectangle().overlaps(missile.getRectangle())) {
                     explosionSound.play();
-                    iter.remove();
-                    iterMissile.remove();
+                    meteorIterator.remove();
+                    missileIterator.remove();
                     numberOfHitMeteors++;
                 }
             }
@@ -153,7 +157,7 @@ public class GameScreen implements Screen {
                 removeHitJet(jet);
             }
 
-            if (meteor.getY() + 143 < 0) iter.remove();
+            if (meteor.getY() + 143 < 0) meteorIterator.remove();
         }
 
         if (System.currentTimeMillis() - lastMeteorTime > METEOR_SPWAN_TIME) {
@@ -164,7 +168,7 @@ public class GameScreen implements Screen {
 
         if (GAME_OVER) {
             gameOverBatch.begin();
-            gameOverBatch.draw(gameOverTexture, 1024 / 2 - 204, 768 /2 - 59);
+            gameOverBatch.draw(gameOverTexture, 1024 / 2 - 204, 768 / 2 - 59);
             gameOverBatch.end();
         } else {
             game.client.moveJet(jetId, newJetLocation.getX(), newJetLocation.getY());
@@ -173,10 +177,10 @@ public class GameScreen implements Screen {
 
     private void removeHitJet(Jet hitJet) {
         explosionSound.play();
-        for (Iterator<Jet> iter = jets.iterator(); iter.hasNext(); ) {
-            Jet jet = iter.next();
+        for (Iterator<Jet> jetIterator = jets.iterator(); jetIterator.hasNext(); ) {
+            Jet jet = jetIterator.next();
             if (jet.getJetId().equals(hitJet.getJetId())) {
-                iter.remove();
+                jetIterator.remove();
                 GAME_OVER = true;
             }
         }

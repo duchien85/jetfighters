@@ -14,10 +14,9 @@ public class JetFightersGame extends Game {
 
     private String jetId;
     public static EventBus eventBus = new EventBus();
-    public UdpClient client = new UdpClient(this, eventBus);
+    public UdpClient client = new UdpClient(this);
 
     public JetFightersGame(String jetId) {
-        // TODO register real listeners on eventbus
         this.jetId = jetId;
     }
 
@@ -29,7 +28,7 @@ public class JetFightersGame extends Game {
             this.setScreen(new MainMenuScreen(this, jetId));
         } catch (Exception e) {
             e.printStackTrace();
-            System.exit(0);
+            System.exit(-1);
         }
     }
 

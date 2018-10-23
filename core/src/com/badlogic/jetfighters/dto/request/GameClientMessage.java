@@ -9,8 +9,6 @@ public abstract class GameClientMessage implements Serializable {
     private InetSocketAddress sender;
     private ChannelHandlerContext ctx;
 
-    abstract int getMessageId();
-
     public ChannelHandlerContext getCtx() {
         return ctx;
     }
