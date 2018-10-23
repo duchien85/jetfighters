@@ -17,7 +17,7 @@ public class GameClientMessageDecoder extends MessageToMessageDecoder<DatagramPa
     @Override
     protected void decode(ChannelHandlerContext ctx, DatagramPacket packet, List out) throws Exception {
         byte[] bytes = readBytesFromBuffer(packet.content());
-        System.out.println("Received packet, length: " + bytes.length);
+        // System.out.println("Received packet, length: " + bytes.length);
         Object payload = deserialize(bytes);
         if (payload instanceof GameClientMessage) {
             GameClientMessage gameClientMessage = (GameClientMessage) payload;

@@ -16,9 +16,4 @@ public class JoinGameMessageResponse implements GameServerMessage {
     public String getStatus() {
         return status;
     }
-
-    @Override
-    public int getMessageId() {
-        return 1;
-    }
 }

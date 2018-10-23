@@ -5,7 +5,6 @@ import com.badlogic.jetfighters.dto.request.GameClientMessage;
 import com.badlogic.jetfighters.dto.request.JetMoveMessage;
 import com.badlogic.jetfighters.dto.request.JoinGameMessage;
 import com.badlogic.jetfighters.dto.serialization.GameMessageSerde;
-import com.google.common.eventbus.EventBus;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -40,8 +39,6 @@ public class UdpClient {
         Bootstrap b = new Bootstrap();
         b.group(workerGroup)
                 .channel(NioDatagramChannel.class)
-//                .attr(AttributeKey.newInstance("game"), game)
-//                .attr(AttributeKey.newInstance("eventBus"), eventBus)
                 .handler(channelInitializer(this));
 
         String host = InetAddress.getLocalHost().getHostAddress();
@@ -70,7 +67,7 @@ public class UdpClient {
             @Override
             public void initChannel(final NioDatagramChannel ch) {
                 ChannelPipeline p = ch.pipeline();
-                p.addLast(new ClientPacketHandler(udpClient, game));
+                p.addLast(new ClientPacketHandler(game));
             }
         };
     }

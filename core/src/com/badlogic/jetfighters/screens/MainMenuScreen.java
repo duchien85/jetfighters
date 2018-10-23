@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.jetfighters.JetFightersGame;
+import com.badlogic.jetfighters.client.eventbus.JoinGameMessageResponseListener;
 
 public class MainMenuScreen implements Screen {
 
@@ -19,6 +20,7 @@ public class MainMenuScreen implements Screen {
     private long lastConnectionAttemptTimestamp = System.currentTimeMillis();
 
     public MainMenuScreen(final JetFightersGame game, final String jetId) {
+        JetFightersGame.eventBus.register(new JoinGameMessageResponseListener(game));
         this.game = game;
         this.jetId = jetId;
         this.camera = new OrthographicCamera();

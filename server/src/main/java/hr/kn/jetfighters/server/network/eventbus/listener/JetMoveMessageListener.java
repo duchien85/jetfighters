@@ -18,8 +18,11 @@ public class JetMoveMessageListener implements ServerMessageListener<JetMoveMess
 
         JetMoveMessageResponse response = new JetMoveMessageResponse(message.getJetId(), message.getX(), message.getY());
         ByteBuf bufResponse = Unpooled.copiedBuffer(GameMessageSerde.serialize((response)));
-        GameState.channelManager.getChannels().forEach((s, channel) ->
-                channel.writeAndFlush(new DatagramPacket(bufResponse, message.getSender())));
+        GameState.channelManager.getChannels().forEach((s, channelAndSender) -> {
+            bufResponse.retain();
+            channelAndSender.getChannel().writeAndFlush(new DatagramPacket(bufResponse, channelAndSender.getSender()));
+        });
+
     }
 
 }

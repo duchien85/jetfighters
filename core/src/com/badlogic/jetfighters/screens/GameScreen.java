@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.jetfighters.JetFightersGame;
 import com.badlogic.jetfighters.client.eventbus.JetMoveMessageResponseListener;
+import com.badlogic.jetfighters.client.eventbus.NewPlayerJoinedMessageResponseListener;
 import com.badlogic.jetfighters.model.Jet;
 import com.badlogic.jetfighters.model.Meteor;
 import com.badlogic.jetfighters.model.Missile;
@@ -28,15 +29,15 @@ public class GameScreen implements Screen {
     private JetFightersGame game;
     private String jetId;
 
-    private BitmapFont font;
+    private BitmapFont font = new BitmapFont();
     private Random random = new Random();
 
     private SpriteBatch textBatch = new SpriteBatch();
     private SpriteBatch gameOverBatch = new SpriteBatch();
-    private OrthographicCamera camera;
+    private OrthographicCamera camera = new OrthographicCamera();
 
-    private Sound explosionSound;
-    private Music airplaneMusic;
+    private Sound explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.wav"));
+    private Music airplaneMusic = Gdx.audio.newMusic(Gdx.files.internal("airplane.mp3"));
 
     private Jet jet;
     public Array<Jet> jets;
@@ -49,37 +50,31 @@ public class GameScreen implements Screen {
 
     private Texture gameOverTexture = new Texture(Gdx.files.internal("game_over.png"));
 
-    private long METEOR_SPWAN_TIME = 3000;
     private long lastMeteorTime = 0;
-
-    private int numberOfHitMeteors = 0;
+    private int numberOfDestroyedMeteors = 0;
+    private long METEOR_SPWAN_TIME = 300000;
 
     private boolean GAME_OVER = false;
 
     public GameScreen(JetFightersGame game, String jetId) {
         JetFightersGame.eventBus.register(new JetMoveMessageResponseListener(this));
+        JetFightersGame.eventBus.register(new NewPlayerJoinedMessageResponseListener(this));
+
         this.game = game;
         this.jetId = jetId;
-        this.font = new BitmapFont();
-
-        // load the explosion sound effect and the airplane background "music"
-        this.explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.wav"));
-        this.airplaneMusic = Gdx.audio.newMusic(Gdx.files.internal("airplane.mp3"));
 
         // start the playback of the background music immediately
         this.airplaneMusic.setLooping(true);
         this.airplaneMusic.play();
 
         // create the camera and the SpriteBatch
-        this.camera = new OrthographicCamera();
         this.camera.setToOrtho(false, 1024, 768);
 
-        this.jet = new Jet(jetId, 1024 / 2 - 64 / 2, 20);
-
         // create containers and spawn the first jet
+        this.jet = new Jet(jetId, 1024 / 2 - 64 / 2, 20);
+        this.jets = Array.with(jet);
         this.missiles = new Array<>();
         this.meteors = new Array<>();
-        this.jets = Array.with(jet);
     }
 
     @Override
@@ -102,7 +97,7 @@ public class GameScreen implements Screen {
         meteorRenderer.render(meteors);
 
         this.textBatch.begin();
-        this.font.draw(this.textBatch, "Destroyed meteors: " + numberOfHitMeteors, 5, 20);
+        this.font.draw(this.textBatch, jet.getJetId() + "\nDestroyed meteors: " + numberOfDestroyedMeteors, 5, 50);
         this.textBatch.end();
 
         // process start new game
@@ -150,7 +145,7 @@ public class GameScreen implements Screen {
                     explosionSound.play();
                     meteorIterator.remove();
                     missileIterator.remove();
-                    numberOfHitMeteors++;
+                    numberOfDestroyedMeteors++;
                 }
             }
             if (meteor.getRectangle().overlaps(jet.getRectangle())) {

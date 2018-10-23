@@ -4,11 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Jet implements Renderable {
+public class Jet implements Renderable, Serializable {
     private String jetId;
     private float x;
     private float y;
@@ -26,12 +27,16 @@ public class Jet implements Renderable {
         this.rectangle = new Rectangle(x, y, 64, 53);
 
         try {
-            this.textures.put(0, new Texture(Gdx.files.internal("fighter/1.png")));
-            this.textures.put(1, new Texture(Gdx.files.internal("fighter/2.png")));
-            this.textures.put(2, new Texture(Gdx.files.internal("fighter/3.png")));
+            initTextures();
         } catch (Exception e) {
             // TODO stupid Exception ignore for server which doesn't have textures
         }
+    }
+
+    private void initTextures() {
+        this.textures.put(0, new Texture(Gdx.files.internal("fighter/1.png")));
+        this.textures.put(1, new Texture(Gdx.files.internal("fighter/2.png")));
+        this.textures.put(2, new Texture(Gdx.files.internal("fighter/3.png")));
     }
 
     public boolean canShoot() {
@@ -72,6 +77,9 @@ public class Jet implements Renderable {
 
     @Override
     public Texture getTexture() {
+        if (textures.size() == 0) {
+            initTextures();
+        }
         if (currentTexture.get() == 3) {
             currentTexture.set(0);
         }

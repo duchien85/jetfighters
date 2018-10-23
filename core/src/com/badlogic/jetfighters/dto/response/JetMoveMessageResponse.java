@@ -22,9 +22,4 @@ public class JetMoveMessageResponse implements GameServerMessage {
     public float getY() {
         return y;
     }
-
-    @Override
-    public int getMessageId() {
-        return 1;
-    }
 }
