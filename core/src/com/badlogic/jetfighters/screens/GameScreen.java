@@ -52,7 +52,7 @@ public class GameScreen implements Screen {
 
     private long lastMeteorTime = 0;
     private int numberOfDestroyedMeteors = 0;
-    private long METEOR_SPWAN_TIME = 300000;
+    private long METEOR_SPWAN_TIME = 3000;
 
     private boolean GAME_OVER = false;
 
@@ -148,10 +148,13 @@ public class GameScreen implements Screen {
                     numberOfDestroyedMeteors++;
                 }
             }
-            if (meteor.getRectangle().overlaps(jet.getRectangle())) {
-                removeHitJet(jet);
-            }
 
+            for (int i = 0; i < jets.size; i++) {
+                Jet jet = jets.get(i);
+                if (meteor.getRectangle().overlaps(jet.getRectangle())) {
+                    removeHitJet(jet);
+                }
+            }
             if (meteor.getY() + 143 < 0) meteorIterator.remove();
         }
 
@@ -176,8 +179,10 @@ public class GameScreen implements Screen {
             Jet jet = jetIterator.next();
             if (jet.getJetId().equals(hitJet.getJetId())) {
                 jetIterator.remove();
-                GAME_OVER = true;
             }
+        }
+        if (jets.size == 0) {
+            GAME_OVER = true;
         }
     }
 
