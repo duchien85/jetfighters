@@ -15,7 +15,7 @@ public class Jet implements Renderable, Serializable {
     private float y;
 
     private AtomicInteger currentTexture = new AtomicInteger(0);
-    private final Map<Integer, Texture> textures = new HashMap<>();
+    private transient Map<Integer, Texture> textures;
 
     private final Rectangle rectangle;
     private long lastShootTime;
@@ -33,7 +33,8 @@ public class Jet implements Renderable, Serializable {
         }
     }
 
-    private void initTextures() {
+    public void initTextures() {
+        this.textures = new HashMap<>();
         this.textures.put(0, new Texture(Gdx.files.internal("fighter/1.png")));
         this.textures.put(1, new Texture(Gdx.files.internal("fighter/2.png")));
         this.textures.put(2, new Texture(Gdx.files.internal("fighter/3.png")));

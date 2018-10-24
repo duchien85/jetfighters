@@ -23,7 +23,7 @@ public class SpawnMeteorTimer {
                 bufResponse.retain();
                 channelAndSender.getChannel().writeAndFlush(new DatagramPacket(bufResponse, channelAndSender.getSender()));
             });
-        }, 0, 3000, TimeUnit.MILLISECONDS);
+        }, 0, 2000, TimeUnit.MILLISECONDS);
     }
 
 }

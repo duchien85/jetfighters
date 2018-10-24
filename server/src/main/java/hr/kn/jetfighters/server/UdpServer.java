@@ -3,6 +3,7 @@ package hr.kn.jetfighters.server;
 import com.google.common.eventbus.EventBus;
 import hr.kn.jetfighters.server.network.codec.GameClientMessageDecoder;
 import hr.kn.jetfighters.server.network.codec.GameClientMessageHandler;
+import hr.kn.jetfighters.server.network.eventbus.listener.FireMissileMessageListener;
 import hr.kn.jetfighters.server.network.eventbus.listener.JetMoveMessageListener;
 import hr.kn.jetfighters.server.network.eventbus.listener.JoinGameMessageListener;
 import hr.kn.jetfighters.server.network.timer.SpawnMeteorTimer;
@@ -29,6 +30,7 @@ public class UdpServer {
     public void run() throws Exception {
         eventBus.register(new JetMoveMessageListener());
         eventBus.register(new JoinGameMessageListener());
+        eventBus.register(new FireMissileMessageListener());
 
 
         final NioEventLoopGroup group = new NioEventLoopGroup();

@@ -4,11 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 
-public class Missile implements Renderable {
+import java.io.Serializable;
+
+public class Missile implements Renderable, Serializable {
     private Jet jet;
     private float x;
     private float y;
-    private final Texture texture = new Texture(Gdx.files.internal("missile.png"));
+    private transient Texture texture;
     private Rectangle rectangle;
 
     private Missile() {
@@ -16,6 +18,7 @@ public class Missile implements Renderable {
 
     public static Missile fromJet(Jet jet) {
         Missile missile = new Missile();
+        missile.texture = new Texture(Gdx.files.internal("missile.png"));
         missile.jet = jet;
         missile.x = (jet.getX() + 32) - 9;
         missile.y = jet.getY() + 89;
@@ -33,6 +36,8 @@ public class Missile implements Renderable {
         this.rectangle.setY(y);
     }
 
+    public void setRectangle(Rectangle rectangle) {this.rectangle = rectangle; }
+
     public Rectangle getRectangle() {
         return rectangle;
     }
@@ -49,6 +54,10 @@ public class Missile implements Renderable {
     @Override
     public float getY() {
         return y;
+    }
+
+    public void setTexture(Texture texture) {
+        this.texture = texture;
     }
 
     @Override

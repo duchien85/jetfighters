@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.jetfighters.JetFightersGame;
+import com.badlogic.jetfighters.client.eventbus.FireMissileMessageResponseListener;
 import com.badlogic.jetfighters.client.eventbus.JetMoveMessageResponseListener;
 import com.badlogic.jetfighters.client.eventbus.NewPlayerJoinedMessageResponseListener;
 import com.badlogic.jetfighters.client.eventbus.SpawnNewMeteorListener;
@@ -51,16 +52,14 @@ public class GameScreen implements Screen {
 
     private Texture gameOverTexture = new Texture(Gdx.files.internal("game_over.png"));
 
-    private long lastMeteorTime = 0;
     private int numberOfDestroyedMeteors = 0;
-    private long METEOR_SPWAN_TIME = 3000;
-
     private boolean GAME_OVER = false;
 
     public GameScreen(JetFightersGame game, String jetId) {
         JetFightersGame.eventBus.register(new JetMoveMessageResponseListener(this));
         JetFightersGame.eventBus.register(new NewPlayerJoinedMessageResponseListener(this));
         JetFightersGame.eventBus.register(new SpawnNewMeteorListener(this));
+        JetFightersGame.eventBus.register(new FireMissileMessageResponseListener(this));
 
         this.game = game;
         this.jetId = jetId;
@@ -118,7 +117,8 @@ public class GameScreen implements Screen {
         if (Gdx.input.isKeyPressed(Keys.RIGHT))
             newJetLocation.setX(newJetLocation.getX() + 200 * Gdx.graphics.getDeltaTime());
         if (Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT) && jet.canShoot()) {
-            missiles.add(Missile.fromJet(jet));
+            // missiles.add(Missile.fromJet(jet));
+            game.client.fireMissile(Missile.fromJet(jet));
             jet.setLastShootTime(System.currentTimeMillis());
         }
 
@@ -134,7 +134,7 @@ public class GameScreen implements Screen {
         for (Iterator<Missile> missileIterator = missiles.iterator(); missileIterator.hasNext(); ) {
             Missile missile = missileIterator.next();
             missile.setY(missile.getY() + 600 * Gdx.graphics.getDeltaTime());
-            if (missile.getY() + 32 > 800) missileIterator.remove();
+            if (missile.getY() + 32 > 768) missileIterator.remove();
         }
 
         for (Iterator<Meteor> meteorIterator = meteors.iterator(); meteorIterator.hasNext(); ) {
@@ -147,7 +147,9 @@ public class GameScreen implements Screen {
                     explosionSound.play();
                     meteorIterator.remove();
                     missileIterator.remove();
-                    numberOfDestroyedMeteors++;
+                    if (missile.getJet().getJetId().equals(jet.getJetId())) {
+                        numberOfDestroyedMeteors++;
+                    }
                 }
             }
 

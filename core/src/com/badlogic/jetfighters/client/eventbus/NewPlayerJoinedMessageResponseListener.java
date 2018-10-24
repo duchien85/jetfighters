@@ -1,5 +1,6 @@
 package com.badlogic.jetfighters.client.eventbus;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.jetfighters.dto.response.NewPlayerJoinedResponse;
 import com.badlogic.jetfighters.screens.GameScreen;
 import com.google.common.eventbus.Subscribe;
@@ -15,7 +16,10 @@ public class NewPlayerJoinedMessageResponseListener {
     @Subscribe
     public void handle(NewPlayerJoinedResponse message) {
         System.out.println("New player joined: " + message.getJet().getJetId());
-        this.gameScreen.jets.add(message.getJet());
+        Gdx.app.postRunnable(() -> {
+            message.getJet().initTextures();
+            this.gameScreen.jets.add(message.getJet());
+        });
     }
 
 }

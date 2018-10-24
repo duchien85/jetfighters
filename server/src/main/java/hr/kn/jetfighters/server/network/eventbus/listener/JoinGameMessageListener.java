@@ -39,8 +39,10 @@ public class JoinGameMessageListener implements ServerMessageListener<JoinGameMe
     private void broadcastNewPlayerInfo(Jet newJet) {
         NewPlayerJoinedResponse newPlayerMessage = new NewPlayerJoinedResponse(newJet);
         ByteBuf newPlayerBuf = Unpooled.copiedBuffer(GameMessageSerde.serialize((newPlayerMessage)));
-        GameState.channelManager.getChannels().forEach((s, channelAndSender) ->
-                channelAndSender.getChannel().writeAndFlush(new DatagramPacket(newPlayerBuf, channelAndSender.getSender()))
+        GameState.channelManager.getChannels().forEach((s, channelAndSender) -> {
+                    newPlayerBuf.retain();
+                    channelAndSender.getChannel().writeAndFlush(new DatagramPacket(newPlayerBuf, channelAndSender.getSender()));
+                }
         );
     }
 }

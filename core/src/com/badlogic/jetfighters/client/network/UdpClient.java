@@ -1,10 +1,12 @@
 package com.badlogic.jetfighters.client.network;
 
 import com.badlogic.jetfighters.JetFightersGame;
+import com.badlogic.jetfighters.dto.request.FireMissileMessage;
 import com.badlogic.jetfighters.dto.request.GameClientMessage;
 import com.badlogic.jetfighters.dto.request.JetMoveMessage;
 import com.badlogic.jetfighters.dto.request.JoinGameMessage;
 import com.badlogic.jetfighters.dto.serialization.GameMessageSerde;
+import com.badlogic.jetfighters.model.Missile;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -54,6 +56,8 @@ public class UdpClient {
     public void moveJet(String jetId, float x, float y) {
         send(new JetMoveMessage(jetId, x, y));
     }
+
+    public void fireMissile(Missile missile) { send(new FireMissileMessage(missile)); }
 
     private void send(GameClientMessage message) {
         ByteBuf byteBuf = Unpooled.copiedBuffer(GameMessageSerde.serialize(message));

@@ -25,6 +25,7 @@ public class JoinGameMessageResponseListener {
             Gdx.app.postRunnable(() -> {
                 GameScreen gameScreen = new GameScreen(game, message.getJetId());
                 for (Map.Entry<String, Jet> jetEntry : message.getJets().entrySet()) {
+                    jetEntry.getValue().initTextures();
                     gameScreen.jets.add(jetEntry.getValue());
                 }
                 game.setScreen(gameScreen);
