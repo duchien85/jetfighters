@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.jetfighters.JetFightersGame;
 import com.badlogic.jetfighters.client.eventbus.JetMoveMessageResponseListener;
 import com.badlogic.jetfighters.client.eventbus.NewPlayerJoinedMessageResponseListener;
+import com.badlogic.jetfighters.client.eventbus.SpawnNewMeteorListener;
 import com.badlogic.jetfighters.model.Jet;
 import com.badlogic.jetfighters.model.Meteor;
 import com.badlogic.jetfighters.model.Missile;
@@ -41,8 +42,8 @@ public class GameScreen implements Screen {
 
     private Jet jet;
     public Array<Jet> jets;
-    private Array<Missile> missiles;
-    private Array<Meteor> meteors;
+    public Array<Missile> missiles;
+    public Array<Meteor> meteors;
 
     private JetRenderer jetRenderer = new JetRenderer();
     private MissileRenderer missileRenderer = new MissileRenderer();
@@ -59,6 +60,7 @@ public class GameScreen implements Screen {
     public GameScreen(JetFightersGame game, String jetId) {
         JetFightersGame.eventBus.register(new JetMoveMessageResponseListener(this));
         JetFightersGame.eventBus.register(new NewPlayerJoinedMessageResponseListener(this));
+        JetFightersGame.eventBus.register(new SpawnNewMeteorListener(this));
 
         this.game = game;
         this.jetId = jetId;
@@ -158,12 +160,6 @@ public class GameScreen implements Screen {
             if (meteor.getY() + 143 < 0) meteorIterator.remove();
         }
 
-        if (System.currentTimeMillis() - lastMeteorTime > METEOR_SPWAN_TIME) {
-            spawnNewMeteor();
-            lastMeteorTime = System.currentTimeMillis();
-        }
-
-
         if (GAME_OVER) {
             gameOverBatch.begin();
             gameOverBatch.draw(gameOverTexture, 1024 / 2 - 204, 768 / 2 - 59);
@@ -184,10 +180,6 @@ public class GameScreen implements Screen {
         if (jets.size == 0) {
             GAME_OVER = true;
         }
-    }
-
-    private void spawnNewMeteor() {
-        meteors.add(new Meteor(random.nextInt((800) + 1), 600));
     }
 
     @Override

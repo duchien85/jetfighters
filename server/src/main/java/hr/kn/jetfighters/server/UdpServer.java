@@ -5,6 +5,7 @@ import hr.kn.jetfighters.server.network.codec.GameClientMessageDecoder;
 import hr.kn.jetfighters.server.network.codec.GameClientMessageHandler;
 import hr.kn.jetfighters.server.network.eventbus.listener.JetMoveMessageListener;
 import hr.kn.jetfighters.server.network.eventbus.listener.JoinGameMessageListener;
+import hr.kn.jetfighters.server.network.timer.SpawnMeteorTimer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -19,6 +20,7 @@ import java.net.InetAddress;
 public class UdpServer {
 
     private EventBus eventBus = new EventBus();
+    private SpawnMeteorTimer spawnMeteorTimer = new SpawnMeteorTimer();
 
     private final Integer SERVER_PORT = 9956;
     private final Integer MAX_PACKET_SIZE = 10_000;
@@ -27,6 +29,7 @@ public class UdpServer {
     public void run() throws Exception {
         eventBus.register(new JetMoveMessageListener());
         eventBus.register(new JoinGameMessageListener());
+
 
         final NioEventLoopGroup group = new NioEventLoopGroup();
         try {
