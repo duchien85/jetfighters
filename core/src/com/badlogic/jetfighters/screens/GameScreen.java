@@ -16,6 +16,10 @@ import com.badlogic.jetfighters.client.eventbus.FireMissileMessageResponseListen
 import com.badlogic.jetfighters.client.eventbus.JetMoveMessageResponseListener;
 import com.badlogic.jetfighters.client.eventbus.NewPlayerJoinedMessageResponseListener;
 import com.badlogic.jetfighters.client.eventbus.SpawnNewMeteorListener;
+import com.badlogic.jetfighters.collision.MeteorAndJetCollisionDetector;
+import com.badlogic.jetfighters.collision.MeteorAndMissileCollisionDetector;
+import com.badlogic.jetfighters.controls.JetMovementControls;
+import com.badlogic.jetfighters.controls.KeyPressController;
 import com.badlogic.jetfighters.model.Jet;
 import com.badlogic.jetfighters.model.Meteor;
 import com.badlogic.jetfighters.model.Missile;
@@ -23,16 +27,12 @@ import com.badlogic.jetfighters.render.JetRenderer;
 import com.badlogic.jetfighters.render.MeteorRenderer;
 import com.badlogic.jetfighters.render.MissileRenderer;
 
-import java.util.Iterator;
-import java.util.Random;
-
 public class GameScreen implements Screen {
 
     private JetFightersGame game;
     private String jetId;
 
     private BitmapFont font = new BitmapFont();
-    private Random random = new Random();
 
     private SpriteBatch textBatch = new SpriteBatch();
     private SpriteBatch gameOverBatch = new SpriteBatch();
@@ -41,18 +41,23 @@ public class GameScreen implements Screen {
     private Sound explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.wav"));
     private Music airplaneMusic = Gdx.audio.newMusic(Gdx.files.internal("airplane.mp3"));
 
-    private Jet jet;
+    public Jet jet;
     public Array<Jet> jets;
     public Array<Missile> missiles;
     public Array<Meteor> meteors;
 
+    /* Operators and handlers */
+    private KeyPressController<Jet> keyPressControllerJet;
     private JetRenderer jetRenderer = new JetRenderer();
     private MissileRenderer missileRenderer = new MissileRenderer();
     private MeteorRenderer meteorRenderer = new MeteorRenderer();
+    private MeteorAndJetCollisionDetector meteorAndJetCollisionDetector;
+    private MeteorAndMissileCollisionDetector meteorAndMissileCollisionDetector;
+
 
     private Texture gameOverTexture = new Texture(Gdx.files.internal("game_over.png"));
 
-    private int numberOfDestroyedMeteors = 0;
+    public int numberOfDestroyedMeteors = 0;
     private boolean GAME_OVER = false;
 
     public GameScreen(JetFightersGame game, String jetId) {
@@ -63,6 +68,10 @@ public class GameScreen implements Screen {
 
         this.game = game;
         this.jetId = jetId;
+
+        this.meteorAndJetCollisionDetector = new MeteorAndJetCollisionDetector(explosionSound);
+        this.meteorAndMissileCollisionDetector = new MeteorAndMissileCollisionDetector(this, explosionSound);
+        this.keyPressControllerJet = new JetMovementControls(game);
 
         // start the playback of the background music immediately
         this.airplaneMusic.setLooping(true);
@@ -107,20 +116,7 @@ public class GameScreen implements Screen {
         }
 
         // process keyboard input and simulate movement that will be sent to server
-        Jet newJetLocation = new Jet(jet.getJetId(), jet.getX(), jet.getY());
-        if (Gdx.input.isKeyPressed(Keys.UP))
-            newJetLocation.setY(newJetLocation.getY() + 200 * Gdx.graphics.getDeltaTime());
-        if (Gdx.input.isKeyPressed(Keys.DOWN))
-            newJetLocation.setY(newJetLocation.getY() - 200 * Gdx.graphics.getDeltaTime());
-        if (Gdx.input.isKeyPressed(Keys.LEFT))
-            newJetLocation.setX(newJetLocation.getX() - 200 * Gdx.graphics.getDeltaTime());
-        if (Gdx.input.isKeyPressed(Keys.RIGHT))
-            newJetLocation.setX(newJetLocation.getX() + 200 * Gdx.graphics.getDeltaTime());
-        if (Gdx.input.isKeyPressed(Keys.CONTROL_RIGHT) && jet.canShoot()) {
-            // missiles.add(Missile.fromJet(jet));
-            game.client.fireMissile(Missile.fromJet(jet));
-            jet.setLastShootTime(System.currentTimeMillis());
-        }
+        Jet newJetLocation = keyPressControllerJet.processControls(Gdx.input, jet);
 
         // make sure the jet stays within the screen bounds
         if (newJetLocation.getX() < 0) newJetLocation.setX(0);
@@ -128,38 +124,17 @@ public class GameScreen implements Screen {
         if (newJetLocation.getY() < 0) newJetLocation.setY(0);
         if (newJetLocation.getY() > 768 - 53) newJetLocation.setY(768 - 53);
 
-        // move missiles, remove any that are beneath the top edge of
-        // the screen or that hit the enemy. In the latter case we play back
-        // a sound effect as well.
-        for (Iterator<Missile> missileIterator = missiles.iterator(); missileIterator.hasNext(); ) {
-            Missile missile = missileIterator.next();
-            missile.setY(missile.getY() + 600 * Gdx.graphics.getDeltaTime());
-            if (missile.getY() + 32 > 768) missileIterator.remove();
-        }
 
-        for (Iterator<Meteor> meteorIterator = meteors.iterator(); meteorIterator.hasNext(); ) {
-            Meteor meteor = meteorIterator.next();
-            meteor.setY(meteor.getY() - 200 * Gdx.graphics.getDeltaTime());
+        // Move meteors and missiles as they move automatically without input
+        meteors.forEach(Meteor::moveOnNewFrame);
+        missiles.forEach(Missile::moveOnNewFrame);
 
-            for (Iterator<Missile> missileIterator = missiles.iterator(); missileIterator.hasNext(); ) {
-                Missile missile = missileIterator.next();
-                if (meteor.getRectangle().overlaps(missile.getRectangle())) {
-                    explosionSound.play();
-                    meteorIterator.remove();
-                    missileIterator.remove();
-                    if (missile.getJet().getJetId().equals(jet.getJetId())) {
-                        numberOfDestroyedMeteors++;
-                    }
-                }
-            }
+        // Detect collissions and remove destroyed object
+        meteorAndMissileCollisionDetector.collideAndRemove(meteors, missiles);
+        meteorAndJetCollisionDetector.collideAndRemove(meteors, jets);
 
-            for (int i = 0; i < jets.size; i++) {
-                Jet jet = jets.get(i);
-                if (meteor.getRectangle().overlaps(jet.getRectangle())) {
-                    removeHitJet(jet);
-                }
-            }
-            if (meteor.getY() + 143 < 0) meteorIterator.remove();
+        if (jets.size == 0) {
+            GAME_OVER = true;
         }
 
         if (GAME_OVER) {
@@ -168,19 +143,6 @@ public class GameScreen implements Screen {
             gameOverBatch.end();
         } else {
             game.client.moveJet(jetId, newJetLocation.getX(), newJetLocation.getY());
-        }
-    }
-
-    private void removeHitJet(Jet hitJet) {
-        explosionSound.play();
-        for (Iterator<Jet> jetIterator = jets.iterator(); jetIterator.hasNext(); ) {
-            Jet jet = jetIterator.next();
-            if (jet.getJetId().equals(hitJet.getJetId())) {
-                jetIterator.remove();
-            }
-        }
-        if (jets.size == 0) {
-            GAME_OVER = true;
         }
     }
 

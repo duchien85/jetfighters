@@ -26,6 +26,7 @@ public class Meteor implements Renderable {
         this.rectangle.setY(y);
     }
 
+    @Override
     public Rectangle getRectangle() {
         return rectangle;
     }
@@ -45,5 +46,8 @@ public class Meteor implements Renderable {
         return texture;
     }
 
-
+    @Override
+    public void moveOnNewFrame() {
+        this.setY(this.getY() - 200 * Gdx.graphics.getDeltaTime());
+    }
 }

@@ -38,6 +38,7 @@ public class Missile implements Renderable, Serializable {
 
     public void setRectangle(Rectangle rectangle) {this.rectangle = rectangle; }
 
+    @Override
     public Rectangle getRectangle() {
         return rectangle;
     }
@@ -63,5 +64,10 @@ public class Missile implements Renderable, Serializable {
     @Override
     public Texture getTexture() {
         return texture;
+    }
+
+    @Override
+    public void moveOnNewFrame() {
+        this.setY(this.getY() + 600 * Gdx.graphics.getDeltaTime());
     }
 }

@@ -58,6 +58,7 @@ public class Jet implements Renderable, Serializable {
         this.rectangle.setY(y);
     }
 
+    @Override
     public Rectangle getRectangle() {
         return rectangle;
     }
@@ -87,5 +88,9 @@ public class Jet implements Renderable, Serializable {
         return textures.get(currentTexture.getAndAdd(1));
     }
 
+    @Override
+    public void moveOnNewFrame() {
+        // jet doesn't move on it's own
+    }
 
 }

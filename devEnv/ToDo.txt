@@ -1,0 +1,2 @@
+1. Create components that control objects vision (can't leave screen border, removed if leaves screen borders etc.)
+2. If your jet is hit, notice server so it can remove you from a memory
