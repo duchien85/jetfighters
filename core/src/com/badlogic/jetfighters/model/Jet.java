@@ -93,4 +93,9 @@ public class Jet implements Renderable, Serializable {
         // jet doesn't move on it's own
     }
 
+    @Override
+    public boolean leftScreenBorders() {
+        return false;
+    }
+
 }

@@ -27,6 +27,8 @@ import com.badlogic.jetfighters.render.JetRenderer;
 import com.badlogic.jetfighters.render.MeteorRenderer;
 import com.badlogic.jetfighters.render.MissileRenderer;
 
+import java.util.Iterator;
+
 public class GameScreen implements Screen {
 
     private JetFightersGame game;
@@ -126,10 +128,25 @@ public class GameScreen implements Screen {
 
 
         // Move meteors and missiles as they move automatically without input
-        meteors.forEach(Meteor::moveOnNewFrame);
-        missiles.forEach(Missile::moveOnNewFrame);
+        for (Iterator<Meteor> meteorIterator = meteors.iterator(); meteorIterator.hasNext(); ) {
+            Meteor meteor = meteorIterator.next();
+            meteor.moveOnNewFrame();
+            if (meteor.leftScreenBorders()) {
+                meteorIterator.remove();
+            }
+        }
 
-        // Detect collissions and remove destroyed object
+        for (Iterator<Missile> missileIterator = missiles.iterator(); missileIterator.hasNext(); ) {
+            Missile missile = missileIterator.next();
+            missile.moveOnNewFrame();
+            if (missile.leftScreenBorders()) {
+                missileIterator.remove();
+            }
+        }
+
+        // Remove objects that have left the screen or not interesting anymore
+
+        // Detect collisions and remove destroyed object
         meteorAndMissileCollisionDetector.collideAndRemove(meteors, missiles);
         meteorAndJetCollisionDetector.collideAndRemove(meteors, jets);
 

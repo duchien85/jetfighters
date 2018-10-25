@@ -13,4 +13,6 @@ public interface Renderable {
     Texture getTexture();
 
     void moveOnNewFrame();
+
+    boolean leftScreenBorders();
 }

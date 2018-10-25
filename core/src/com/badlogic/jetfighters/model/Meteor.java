@@ -50,4 +50,9 @@ public class Meteor implements Renderable {
     public void moveOnNewFrame() {
         this.setY(this.getY() - 200 * Gdx.graphics.getDeltaTime());
     }
+
+    @Override
+    public boolean leftScreenBorders() {
+        return this.getY() + 143 < 0;
+    }
 }

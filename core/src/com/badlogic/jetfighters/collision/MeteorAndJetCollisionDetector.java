@@ -1,6 +1,5 @@
 package com.badlogic.jetfighters.collision;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.jetfighters.model.Jet;
@@ -26,7 +25,6 @@ public class MeteorAndJetCollisionDetector implements CollisionDetector<Array<Me
                     removeHitJet(jets, jet);
                 }
             }
-            if (meteor.getY() + 143 < 0) meteorIterator.remove();
         }
     }
 

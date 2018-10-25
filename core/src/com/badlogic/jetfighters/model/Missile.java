@@ -70,4 +70,9 @@ public class Missile implements Renderable, Serializable {
     public void moveOnNewFrame() {
         this.setY(this.getY() + 600 * Gdx.graphics.getDeltaTime());
     }
+
+    @Override
+    public boolean leftScreenBorders() {
+        return this.getY() + 32 > 768;
+    }
 }
