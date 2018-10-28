@@ -13,24 +13,31 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.socket.DatagramPacket;
 
+import java.util.Random;
+
 public class JoinGameMessageListener implements ServerMessageListener<JoinGameMessage> {
+
+    private Random r = new Random();
 
     @Subscribe
     @Override
     public void handle(JoinGameMessage message) {
         System.out.println("Player " + message.getDesiredJetId() + " is requesting to join a game.");
-        JoinGameMessageResponse response = new JoinGameMessageResponse(
-                message.getDesiredJetId(), "SUCCESS", GameState.jetManager.getJets());
-        ByteBuf bufResponse = Unpooled.copiedBuffer(GameMessageSerde.serialize((response)));
-        ChannelFuture future = message.getCtx().channel().writeAndFlush(new DatagramPacket(bufResponse, message.getSender()));
 
-        future.addListener(future1 -> {
-            Jet newJet = new Jet(message.getDesiredJetId(), 0, 0);
-            if (future.isSuccess()) {
-                GameState.jetManager.getJets().put(message.getDesiredJetId(), newJet);
+        int texture = r.nextInt(4) + 1;
+        Jet newJet = new Jet(message.getDesiredJetId(), 1024 / 2 - 64 / 2, 0, texture);
+        JoinGameMessageResponse response = new JoinGameMessageResponse(
+                newJet, "SUCCESS", GameState.jetManager.getJets());
+
+        ByteBuf bufResponse = Unpooled.copiedBuffer(GameMessageSerde.serialize((response)));
+        ChannelFuture f1 = message.getCtx().channel().writeAndFlush(new DatagramPacket(bufResponse, message.getSender()));
+
+        f1.addListener(f -> {
+            if (f1.isSuccess()) {
                 broadcastNewPlayerInfo(newJet);
+                GameState.jetManager.getJets().put(newJet.getJetId(), newJet);
                 GameState.channelManager.getChannels().put(
-                        message.getDesiredJetId(), new ChannelAndSender(message.getCtx().channel(), message.getSender())
+                        newJet.getJetId(), new ChannelAndSender(message.getCtx().channel(), message.getSender())
                 );
             }
         });

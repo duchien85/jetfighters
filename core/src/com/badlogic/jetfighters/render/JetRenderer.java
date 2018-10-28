@@ -11,9 +11,9 @@ public class JetRenderer implements Renderer<Jet> {
     private SpriteBatch batch = new SpriteBatch();
 
     @Override
-    public void render(Array<Jet> spaceships) {
+    public void render(Array<Jet> jets) {
         batch.begin();
-        for (Iterator<Jet> iter = spaceships.iterator(); iter.hasNext(); ) {
+        for (Iterator<Jet> iter = jets.iterator(); iter.hasNext(); ) {
             Jet jet = iter.next();
             batch.draw(jet.getTexture(), jet.getX(), jet.getY());
         }

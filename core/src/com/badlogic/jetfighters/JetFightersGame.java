@@ -9,15 +9,21 @@ import com.google.common.eventbus.EventBus;
 
 public class JetFightersGame extends Game {
 
+    private String server;
+
     public SpriteBatch batch;
     public BitmapFont font;
 
     public static EventBus eventBus = new EventBus();
     public UdpClient client = new UdpClient(this);
 
+    public JetFightersGame(String server) {
+        this.server = server;
+    }
+
     public void create() {
         try {
-            client.start();
+            client.start(server);
             this.batch = new SpriteBatch();
             this.font = new BitmapFont(); // Use LibGDX's default Arial font.
             this.setScreen(new MainMenuScreen(this));

@@ -23,9 +23,8 @@ public class JoinGameMessageResponseListener {
         if ("SUCCESS".equals(message.getStatus())) {
             game.client.state = UdpClientState.CONNECTED;
             Gdx.app.postRunnable(() -> {
-                GameScreen gameScreen = new GameScreen(game, message.getJetId());
+                GameScreen gameScreen = new GameScreen(game, message.getJet());
                 for (Map.Entry<String, Jet> jetEntry : message.getJets().entrySet()) {
-                    jetEntry.getValue().initTextures();
                     gameScreen.jets.add(jetEntry.getValue());
                 }
                 game.setScreen(gameScreen);

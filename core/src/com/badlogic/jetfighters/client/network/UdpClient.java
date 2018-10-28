@@ -1,10 +1,7 @@
 package com.badlogic.jetfighters.client.network;
 
 import com.badlogic.jetfighters.JetFightersGame;
-import com.badlogic.jetfighters.dto.request.FireMissileMessage;
-import com.badlogic.jetfighters.dto.request.GameClientMessage;
-import com.badlogic.jetfighters.dto.request.JetMoveMessage;
-import com.badlogic.jetfighters.dto.request.JoinGameMessage;
+import com.badlogic.jetfighters.dto.request.*;
 import com.badlogic.jetfighters.dto.serialization.GameMessageSerde;
 import com.badlogic.jetfighters.model.Missile;
 import io.netty.bootstrap.Bootstrap;
@@ -35,7 +32,7 @@ public class UdpClient {
         this.game = game;
     }
 
-    public void start() throws InterruptedException, UnknownHostException {
+    public void start(String server) throws InterruptedException, UnknownHostException {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
         Bootstrap b = new Bootstrap();
@@ -43,7 +40,7 @@ public class UdpClient {
                 .channel(NioDatagramChannel.class)
                 .handler(channelInitializer(this));
 
-        String host = InetAddress.getLocalHost().getHostAddress();
+        String host = server != null ? server : InetAddress.getLocalHost().getHostAddress();
         this.remoteAddress = new InetSocketAddress(host, 9956);
         this.channel = b.bind(0).sync().channel();
     }
@@ -58,6 +55,8 @@ public class UdpClient {
     }
 
     public void fireMissile(Missile missile) { send(new FireMissileMessage(missile)); }
+
+    public void reportJetDestroyed(String jetId) { send(new JetDestroyedMessage(jetId)); }
 
     private void send(GameClientMessage message) {
         ByteBuf byteBuf = Unpooled.copiedBuffer(GameMessageSerde.serialize(message));

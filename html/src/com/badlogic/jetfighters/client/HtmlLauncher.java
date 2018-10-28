@@ -3,6 +3,7 @@ package com.badlogic.jetfighters.client;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
+import com.badlogic.jetfighters.JetFightersGame;
 
 public class HtmlLauncher extends GwtApplication {
     @Override
@@ -12,7 +13,7 @@ public class HtmlLauncher extends GwtApplication {
 
     @Override
     public ApplicationListener createApplicationListener() {
-        return new JetFightersCore();
+        return new JetFightersGame();
     }
 
 }

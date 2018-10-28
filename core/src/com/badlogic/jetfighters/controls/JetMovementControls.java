@@ -16,7 +16,7 @@ public class JetMovementControls implements KeyPressController<Jet> {
 
     @Override
     public Jet processControls(Input input, Jet jet) {
-        Jet newJetLocation = new Jet(jet.getJetId(), jet.getX(), jet.getY());
+        Jet newJetLocation = new Jet(jet.getJetId(), jet.getX(), jet.getY(), jet.getTextureNumber());
         if (Gdx.input.isKeyPressed(Input.Keys.UP))
             newJetLocation.setY(newJetLocation.getY() + 200 * Gdx.graphics.getDeltaTime());
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN))

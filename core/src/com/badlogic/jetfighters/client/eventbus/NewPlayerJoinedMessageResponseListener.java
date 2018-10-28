@@ -15,11 +15,10 @@ public class NewPlayerJoinedMessageResponseListener {
 
     @Subscribe
     public void handle(NewPlayerJoinedResponse message) {
-        System.out.println("New player joined: " + message.getJet().getJetId());
-        Gdx.app.postRunnable(() -> {
-            message.getJet().initTextures();
-            this.gameScreen.jets.add(message.getJet());
-        });
+        System.out.println("New player joined: " + message.getJet());
+        Gdx.app.postRunnable(() ->
+            this.gameScreen.jets.add(message.getJet())
+        );
     }
 
 }

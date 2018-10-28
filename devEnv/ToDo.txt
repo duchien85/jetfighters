@@ -1,3 +1,2 @@
-1. Lower number of duplicated loops (foreach meteor, foreach jet....)
-2. If your jet is hit, notice server so it can remove you from a memory
-3. Create random and different textures so multiple players can differ one from another
+1. Jet hit acts weir in multiplayer, fix so game state is synced for all players
+2. Lower number of duplicated loops (foreach meteor, foreach jet....)

@@ -62,16 +62,16 @@ public class GameScreen implements Screen {
     public int numberOfDestroyedMeteors = 0;
     private boolean GAME_OVER = false;
 
-    public GameScreen(JetFightersGame game, String jetId) {
+    public GameScreen(JetFightersGame game, Jet jet) {
         JetFightersGame.eventBus.register(new JetMoveMessageResponseListener(this));
         JetFightersGame.eventBus.register(new NewPlayerJoinedMessageResponseListener(this));
         JetFightersGame.eventBus.register(new SpawnNewMeteorListener(this));
         JetFightersGame.eventBus.register(new FireMissileMessageResponseListener(this));
 
         this.game = game;
-        this.jetId = jetId;
+        this.jetId = jet.getJetId();
 
-        this.meteorAndJetCollisionDetector = new MeteorAndJetCollisionDetector(explosionSound);
+        this.meteorAndJetCollisionDetector = new MeteorAndJetCollisionDetector(game, this, explosionSound);
         this.meteorAndMissileCollisionDetector = new MeteorAndMissileCollisionDetector(this, explosionSound);
         this.keyPressControllerJet = new JetMovementControls(game);
 
@@ -83,7 +83,7 @@ public class GameScreen implements Screen {
         this.camera.setToOrtho(false, 1024, 768);
 
         // create containers and spawn the first jet
-        this.jet = new Jet(jetId, 1024 / 2 - 64 / 2, 20);
+        this.jet = jet;
         this.jets = Array.with(jet);
         this.missiles = new Array<>();
         this.meteors = new Array<>();

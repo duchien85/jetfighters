@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import hr.kn.jetfighters.server.network.codec.GameClientMessageDecoder;
 import hr.kn.jetfighters.server.network.codec.GameClientMessageHandler;
 import hr.kn.jetfighters.server.network.eventbus.listener.FireMissileMessageListener;
+import hr.kn.jetfighters.server.network.eventbus.listener.JetDestroyedMessageListener;
 import hr.kn.jetfighters.server.network.eventbus.listener.JetMoveMessageListener;
 import hr.kn.jetfighters.server.network.eventbus.listener.JoinGameMessageListener;
 import hr.kn.jetfighters.server.network.timer.SpawnMeteorTimer;
@@ -31,6 +32,7 @@ public class UdpServer {
         eventBus.register(new JetMoveMessageListener());
         eventBus.register(new JoinGameMessageListener());
         eventBus.register(new FireMissileMessageListener());
+        eventBus.register(new JetDestroyedMessageListener());
 
 
         final NioEventLoopGroup group = new NioEventLoopGroup();
@@ -43,7 +45,8 @@ public class UdpServer {
                     .attr(AttributeKey.newInstance("eventBus"), eventBus)
                     .handler(channelInitializer());
 
-            InetAddress address = InetAddress.getLocalHost();
+            // InetAddress address = InetAddress.getLocalHost();
+            InetAddress address = InetAddress.getByName("192.168.6.140");
             System.out.printf("Waiting for messages [%s:%d]\n", String.format(address.toString()), SERVER_PORT);
             b.bind(address, SERVER_PORT).sync().channel().closeFuture().await();
         } finally {
