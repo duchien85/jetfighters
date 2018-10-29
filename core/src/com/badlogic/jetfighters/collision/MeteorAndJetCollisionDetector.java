@@ -29,13 +29,12 @@ public class MeteorAndJetCollisionDetector implements CollisionDetector<Array<Me
                 Jet jet = jetIterator.next();
                 if (meteor.getRectangle().overlaps(jet.getRectangle())) {
                     explosionSound.play();
-                    System.out.print("Did I die? " + jet.getJetId() + " " + gameScreen.jet.getJetId());
                     if (jet.getJetId().equals(gameScreen.jet.getJetId())) {
                         game.client.reportJetDestroyed(gameScreen.jet.getJetId());
                     }
-                    System.out.println("Removing jet " + jet.getJetId());
+                    System.out.print("Removing jet: " + jet.getJetId());
                     jetIterator.remove();
-                    System.out.println("Remaining jets: " + gameScreen.jets.size);
+                    System.out.println(". Remaining jets: " + gameScreen.jets.size);
                 }
             }
         }

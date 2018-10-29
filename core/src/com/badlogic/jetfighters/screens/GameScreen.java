@@ -144,8 +144,6 @@ public class GameScreen implements Screen {
             }
         }
 
-        // Remove objects that have left the screen or not interesting anymore
-
         // Detect collisions and remove destroyed object
         meteorAndMissileCollisionDetector.collideAndRemove(meteors, missiles);
         meteorAndJetCollisionDetector.collideAndRemove(meteors, jets);
