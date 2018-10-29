@@ -10,6 +10,7 @@ public class Jet implements Renderable, Serializable {
     private String jetId;
     private float x;
     private float y;
+    private int score;
 
     private int textureNumber;
     private transient Texture texture;
@@ -69,6 +70,14 @@ public class Jet implements Renderable, Serializable {
     @Override
     public Texture getTexture() {
         return texture != null ? texture : (texture = new Texture(Gdx.files.internal("fighter/" + textureNumber + ".png")));
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 
     @Override

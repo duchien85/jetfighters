@@ -35,6 +35,7 @@ public class GameScreen implements Screen {
     private String jetId;
 
     private BitmapFont font = new BitmapFont();
+    private Texture playerBarTexture = new Texture(Gdx.files.internal("player_bar.png"));
 
     private SpriteBatch textBatch = new SpriteBatch();
     private SpriteBatch gameOverBatch = new SpriteBatch();
@@ -87,6 +88,8 @@ public class GameScreen implements Screen {
         this.jets = Array.with(jet);
         this.missiles = new Array<>();
         this.meteors = new Array<>();
+
+        this.font.setColor(0, 0, 0, 100);
     }
 
     @Override
@@ -109,7 +112,14 @@ public class GameScreen implements Screen {
         meteorRenderer.render(meteors);
 
         this.textBatch.begin();
-        this.font.draw(this.textBatch, jet.getJetId() + "\nDestroyed meteors: " + numberOfDestroyedMeteors, 5, 50);
+        int xPlayer = 0;
+        int xFont = 45;
+        for (Jet player : jets) {
+            this.textBatch.draw(playerBarTexture, xPlayer, 0);
+            this.font.draw(this.textBatch, player.getJetId() + "\nMeteors: " + numberOfDestroyedMeteors, xFont, 40);
+            xFont += 205;
+            xPlayer += 205;
+        }
         this.textBatch.end();
 
         // process start new game

@@ -1,1 +1,6 @@
+### Features
+1. Showing all user scores on screen
+2. Better menu for entering user data, saving user data, picking photo
+
+### Bug fixes and optimisations
 1. Lower number of duplicated loops (foreach meteor, foreach jet....)

@@ -29,6 +29,7 @@ public class MeteorAndMissileCollisionDetector implements CollisionDetector<Arra
                     meteorIterator.remove();
                     missileIterator.remove();
                     if (missile.getJet().getJetId().equals(gameScreen.jet.getJetId())) {
+                        // TODO notify server about hit
                         gameScreen.numberOfDestroyedMeteors++;
                     }
                 }
