@@ -14,6 +14,6 @@ public class DesktopLauncher {
         config.width = 1024;
         config.height = 768;
         String server = arg.length == 1 ? arg[0] : InetAddress.getLocalHost().getHostAddress();
-        new LwjglApplication(new JetFightersGame(server), config); // TODO read ID from command line args
+        new LwjglApplication(new JetFightersGame(server), config);
     }
 }

@@ -1,2 +1,1 @@
-1. Jet hit acts weir in multiplayer, fix so game state is synced for all players
-2. Lower number of duplicated loops (foreach meteor, foreach jet....)
+1. Lower number of duplicated loops (foreach meteor, foreach jet....)

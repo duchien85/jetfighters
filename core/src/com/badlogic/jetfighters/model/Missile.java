@@ -63,7 +63,7 @@ public class Missile implements Renderable, Serializable {
 
     @Override
     public Texture getTexture() {
-        return texture;
+        return texture != null ? texture : new Texture(Gdx.files.internal("missile.png"));
     }
 
     @Override

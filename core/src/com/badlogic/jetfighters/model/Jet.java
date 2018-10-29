@@ -23,12 +23,6 @@ public class Jet implements Renderable, Serializable {
         this.y = y;
         this.textureNumber = textureNumber;
         this.rectangle = new Rectangle(x, y, 64, 53);
-
-        try {
-            this.texture = new Texture(Gdx.files.internal("fighter/" + textureNumber + ".png"));
-        } catch (Exception e) {
-            // TODO stupid Exception ignore for server which doesn't have textures
-        }
     }
 
     public boolean canShoot() {
@@ -74,7 +68,7 @@ public class Jet implements Renderable, Serializable {
 
     @Override
     public Texture getTexture() {
-        return texture != null ? texture : new Texture(Gdx.files.internal("fighter/" + textureNumber + ".png"));
+        return texture != null ? texture : (texture = new Texture(Gdx.files.internal("fighter/" + textureNumber + ".png")));
     }
 
     @Override

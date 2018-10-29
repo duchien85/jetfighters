@@ -10,12 +10,6 @@ import io.netty.channel.socket.DatagramPacket;
 // TODO bolje codece sloziti za klijenta
 public class ClientPacketHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
-    private final JetFightersGame game;
-
-    public ClientPacketHandler(JetFightersGame game) {
-        this.game = game;
-    }
-
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) throws Exception {
         ByteBuf buf = msg.content();

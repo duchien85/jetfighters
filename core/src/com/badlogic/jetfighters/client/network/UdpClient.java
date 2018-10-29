@@ -70,7 +70,7 @@ public class UdpClient {
             @Override
             public void initChannel(final NioDatagramChannel ch) {
                 ChannelPipeline p = ch.pipeline();
-                p.addLast(new ClientPacketHandler(game));
+                p.addLast(new ClientPacketHandler());
             }
         };
     }

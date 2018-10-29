@@ -12,7 +12,6 @@ import java.io.ObjectInputStream;
 import java.util.List;
 
 // TODO parse bytes to message in an inteligent way (custom binary, Java serialization, protobuf, json..?)
-// TODO Process message delegating to services, managers, repos etc.
 public class GameClientMessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
     @Override
     protected void decode(ChannelHandlerContext ctx, DatagramPacket packet, List out) throws Exception {
