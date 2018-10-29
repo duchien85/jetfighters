@@ -10,7 +10,8 @@ public class JetDestroyedMessageListener implements ServerMessageListener<JetDes
     @Override
     public void handle(JetDestroyedMessage message) {
         System.out.println("Died jet: " + message.getJetId());
-        GameState.channelManager.getChannels().remove(message.getJetId());
+        // TODO don't remove channel, channel removal is based on heartbeat (to be implemented)
+        // GameState.channelManager.getChannels().remove(message.getJetId());
         GameState.jetManager.getJets().remove(message.getJetId());
     }
 

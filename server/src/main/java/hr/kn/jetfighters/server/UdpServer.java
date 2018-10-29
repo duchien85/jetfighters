@@ -45,8 +45,8 @@ public class UdpServer {
                     .attr(AttributeKey.newInstance("eventBus"), eventBus)
                     .handler(channelInitializer());
 
-            // InetAddress address = InetAddress.getLocalHost();
-            InetAddress address = InetAddress.getByName("192.168.6.140");
+            InetAddress address = InetAddress.getLocalHost();
+            // InetAddress address = InetAddress.getByName("192.168.6.140");
             System.out.printf("Waiting for messages [%s:%d]\n", String.format(address.toString()), SERVER_PORT);
             b.bind(address, SERVER_PORT).sync().channel().closeFuture().await();
         } finally {
